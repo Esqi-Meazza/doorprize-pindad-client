@@ -1,0 +1,380 @@
+:root {
+  --color-biru: #08415c;
+  --color-golden: #b39c4d;
+  --color-white: #ffffff;
+  --color-oil: #474b24;
+  --duration:0.7s;
+  --s:8px;
+  --m:16px;
+  --l:24px;
+}
+
+/* CONTAINER UTAMA */
+.split-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  overflow: hidden;
+  transition: background-color var(--duration) ease; 
+}
+
+.split-container.bg-putih {
+  background-color: var(--color-white);
+}
+
+.split-container.bg-biru {
+  background-color: var(--color-biru);
+}
+
+
+  /* PANEL DASAR (Sisi Kiri & Kanan) */
+.panel-base {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background-color: transparent; 
+}
+
+/* kiri */
+
+.title-spin {
+  font-size: 4rem;
+  line-height: 1.1;
+  color: var(--color-biru);
+  margin-bottom: var(--m);
+  font-weight: 800;
+}
+
+.subtitle-spin {
+  color: var(--color-biru);
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1.2;
+  margin-top: 0;
+  margin-bottom: var(--l);
+  max-width: 380px; 
+  transition: opacity 0.3s ease;
+}
+
+.btn-sikat {
+  background-color: var(--color-biru);
+  color: var(--color-white);
+  margin-top: 20px;
+  border: none;
+  padding: 15px 50px;
+  font-size: 1.5rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.split-container.bg-biru .title-spin,
+.split-container.bg-biru .subtitle-spin,
+.split-container.bg-biru .btn-sikat {
+  opacity: 0;
+  pointer-events: none;
+}
+
+
+/* KONTEN FORM (Kanan) */
+.form-content {
+    width: 100%;
+    max-width: 400px;
+    z-index: 1;
+}
+
+.btn-kembali {
+  background-color: var(--color-biru);
+  mix-blend-mode: difference;
+  color: var(--color-white);
+  border: none;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+.btn-kembali:hover {
+  opacity: 0.9;
+}
+
+.title-masuk {
+  color: var(--color-white);
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-group input, .input-group input-field {
+  width: 100%;
+  background-color: var(--color-white);
+  border: none;
+  border-radius: 50px;
+  padding: 15px 65px 15px 25px; 
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--color-biru);
+  outline: none;
+  font-family: inherit;
+  box-sizing: border-box; 
+}
+
+.input-group input::placeholder {
+  color: var(--color-biru);
+}
+
+.input-icon {
+  position: absolute;
+  right: 25px;
+  color: var(--color-oil);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.input-group .btn-submit {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 15px 65px 15px 25px;
+  text-align: left;
+  position: relative;
+  margin-top: 0;
+}
+
+.input-group .btn-submit .input-icon {
+  position: absolute;
+  right: 25px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.btn-date-text {
+  color: var(--color-biru);
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.btn-submit {
+  background-color: var(--color-white);
+  color: var(--color-biru);
+  border: none;
+  padding: 15px;
+  font-size: 1.2rem;
+  font-weight: 800;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: all 0.3s ease;
+}
+
+.btn-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 1px 1px 0px var(--color-oil),
+                2px 2px 0px var(--color-oil),
+                3px 3px 0px var(--color-oil),
+                4px 4px 0px var(--color-oil),
+                5px 5px 0px var(--color-oil),
+                6px 6px 0px var(--color-oil);
+}
+
+.btn-submit:active {
+  transform: scale(0.97);
+}
+
+.input-btn {
+  position: absolute;
+  right: 80px;
+  color: var(--color-oil);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/*SLIDING OVERLAY PANEL*/
+.panel-overlay {
+  position: absolute;
+  top: 0;
+  /* Posisi awal: Nempel di KANAN (menutupi form) */
+  right: 0; 
+  width: 50%;
+  height: 100%;
+  background-color: var(--color-biru);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  
+  /* Bentuk Awal: Melengkung dan bergaris emas di KIRI */
+  border-radius: 80px 0 0 80px;
+  border-left: var(--m) solid var(--color-golden);
+  
+  /* Transisi Mulus untuk perpindahan, warna, dan border */
+  transition: transform var(--duration) cubic-bezier(0.77, 0, 0.175, 1), 
+              background-color var(--duration) ease, 
+              border-radius var(--duration) ease;
+}
+
+/* STATE AKTIF (Tombol SIKATTT Diklik) */
+.panel-overlay.active {
+  /* Pindah ke KIRI */
+  transform: translateX(-100%);
+  
+  /* Warna berubah jadi Putih */
+  background-color: var(--color-white);
+  
+  /* Bentuk Berubah: Melengkung dan bergaris emas di KANAN */
+  border-radius: 0 80px 80px 0;
+  border-left: none;
+  border-right: var(--m) solid var(--color-golden);
+}
+
+.ilustrasi-img {
+  width: 100%;
+  max-width: 600px;
+  height: auto;
+  z-index: 11;
+  transition: transform 0.3s ease;
+}
+
+
+/* ====================================================
+   RESPONSIVE MOBILE (ANDROID / IOS)
+   ==================================================== */
+@media screen and (max-width: 768px) {
+  .split-container {
+    flex-direction: column;
+  }
+
+  .panel-base {
+    width: 100%;
+    height: 50%;
+    padding: 38px;   
+    box-sizing: border-box;
+  }
+
+  /* --- PENYESUAIAN SISI CTA (SPIN WHEEL) --- */
+  .title-spin {
+    font-size: 2.8rem; 
+    margin-bottom: var(--l);
+  }
+
+  .subtitle-spin {
+    font-size: 0.85rem; 
+    margin-bottom: var(--l);
+    max-width: 100%;
+  }
+
+  .btn-sikat {
+    padding: 10px 30px; 
+    font-size: 1.1rem;
+  }
+
+  /* --- PENYESUAIAN SISI FORM (MASUK CUNG) --- */
+  .form-content {
+    width: 100%;
+    max-width: 280px; /* Membatasi lebar form di HP */
+  }
+
+  .panel-base.right {
+    justify-content: center;
+    align-items: center;
+    padding-top: 0;
+  }
+
+  .form-content {
+    margin-top: 0;
+  }
+
+  .title-masuk {
+    font-size: 1.2rem; /* Dikecilkan dari 2.5rem */
+    margin-bottom: var(--m);
+  }
+
+  .register-form {
+    gap: var(--s); /* Jarak antar input dipersempit */
+  }
+
+  .input-group input {
+    padding: var(--s) var(--m);
+    font-size: 0.88rem;
+  }
+
+  /* Icon dalam input ikut disesuaikan ukurannya */
+  .input-icon {
+    font-size: 1.5rem !important;
+    right: 15px;
+  }
+
+  .input-group .btn-submit {
+  padding: var(--s) var(--m);
+}
+
+.input-group .btn-submit .input-icon {
+  position: absolute;
+  right: var(--m);
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.btn-date-text {
+  color: var(--color-biru);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+  .btn-submit {
+    padding: var(--s) var(--m);
+    font-size: 1rem;
+    margin-top: 5px;
+  }
+
+  /* --- PENYESUAIAN ILUSTRASI & OVERLAY --- */
+  .panel-overlay {
+    width: 100%;
+    height: 50%;
+    top: auto;
+    bottom: 0;
+    right: auto;
+    background-color: var(--color-biru);
+    border-radius: 40px 40px 0 0;
+    border-left: none;
+    border-top: 8px solid var(--color-golden); /* Garis emas dibuat lebih tipis di HP */
+    
+    transition: transform var(--duration) cubic-bezier(0.77, 0, 0.175, 1), 
+                background-color var(--duration) ease, border-radius var(--duration) ease;
+  }
+
+  .ilustrasi-img {
+    width: 85%;
+    max-width: 320px;
+  }
+
+  .panel-overlay.active {
+    height: 52%;
+    transform: translateY(-100%);
+    background-color: var(--color-white);
+    border-radius: 0 0 40px 40px;
+    border-right: none;
+    border-bottom: 8px solid var(--color-golden);
+  }
+
+
+}
