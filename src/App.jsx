@@ -5,7 +5,6 @@ import DoorPrize from "./components/public/doorprize.jsx";
 import Grit from "./components/public/features/boxgrid.jsx"
 // panitia 
 import Login from "./components/admin/login.jsx";
-import DashboardAdmin from "./components/admin/dashboardAdmin.jsx";
 import ProtectedRoute from "./components/admin/protectedRoute.jsx";
 import AdminLayout from "./components/admin/dashboardAdmin.jsx";
 import DashboardPage from "./components/admin/pages/dashboard.jsx";

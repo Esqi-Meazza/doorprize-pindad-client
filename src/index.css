@@ -80,14 +80,6 @@
     }
 }
 
-@utility login-icon {
-    width: clamp(18px, 3vw, 22px);
-    height: clamp(18px, 3vw, 22px);
-    fill: var(--olive) !important;
-    flex-shrink: 0;
-    transition: fill var(--transition);
-}
-
 @utility nav-item {
     display: flex;
     align-items: center;

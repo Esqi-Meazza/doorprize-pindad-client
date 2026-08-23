@@ -272,7 +272,7 @@ export default function MainEventPage() {
 
                 {isProjectorActive && (
                   <p className="text-sm text-green-600 font-bold mt-4 animate-pulse">
-                    🟢 Layar Proyektor Terhubung
+                     Layar Proyektor Terhubung
                   </p>
                 )}
               </>

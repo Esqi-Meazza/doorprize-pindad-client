@@ -19,7 +19,6 @@ import {
   Alert,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import * as AlertDialog from "@radix-ui/react-alert-dialog";
 import { BACKEND_URL } from "../../../config/socket.js";
 
@@ -144,7 +143,7 @@ export default function PesertaPage() {
       } else {
         showSnackbar(data.error || "Gagal menghapus peserta", "error");
       }
-    } catch (err) {
+    } catch {
       showSnackbar("Terjadi kesalahan server", "error");
     } finally {
       setDeleteSingleOpen(false);

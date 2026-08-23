@@ -198,16 +198,6 @@
   transform: scale(0.97);
 }
 
-.input-btn {
-  position: absolute;
-  right: 80px;
-  color: var(--color-oil);
-  pointer-events: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 /*SLIDING OVERLAY PANEL*/
 .panel-overlay {
   position: absolute;

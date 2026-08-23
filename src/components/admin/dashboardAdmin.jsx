@@ -2,7 +2,6 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import PeopleIcon from "@mui/icons-material/People";
 import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
-import BusinessIcon from "@mui/icons-material/Business";
 import LogoutIcon from "@mui/icons-material/Logout";
 import StarsIcon from '@mui/icons-material/Stars';
 import SettingsIcon from '@mui/icons-material/Settings';

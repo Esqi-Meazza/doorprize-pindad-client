@@ -51,7 +51,7 @@ export default function AdminLogin() {
     } else {
       setSnackbar({ open: true, message: data.error, severity: "error" });
     }
-  } catch (err) {
+  } catch {
     setSnackbar({ open: true, message: "Gagal terhubung ke server. Pastikan server menyala.", severity: "warning" });
   } finally {
     setIsLoading(false); 

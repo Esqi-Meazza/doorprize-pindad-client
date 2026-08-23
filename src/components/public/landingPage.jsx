@@ -7,7 +7,6 @@ import Button from '@mui/material/Button';
 import Drawer from "@mui/material/Drawer";
 import Typography from "@mui/material/Typography";
 import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
 import CircularProgress from '@mui/material/CircularProgress';
 import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
@@ -100,7 +99,7 @@ export default function LandingPage() {
             setDivisi("Data tidak ditemukan");
             setSnackbar({ open: true, message: "NIP/Tanggal lahir tidak ditemukan", severity: "warning" });
           }
-        } catch (error) {
+        } catch {
           setNama("Gagal terhubung ke server");
           setDivisi("Gagal terhubung ke server");
           setSnackbar({ open: true, message: "Terjadi kesalahan server!", severity: "error" });
@@ -159,7 +158,7 @@ export default function LandingPage() {
     } else {
       setSnackbar({ open: true, message: resData.error, severity: "error" });
     }
-      } catch (error) {
+      } catch {
         setSnackbar({ open: true, message: "Terjadi kesalahan server!", severity: "error" });
       } finally {
         setIsLoadingSubmit(false);

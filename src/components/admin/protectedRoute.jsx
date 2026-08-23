@@ -18,7 +18,7 @@ export default function ProtectedRoute() {
     }
 
     return <Outlet />;
-  } catch (error) {
+  } catch {
     localStorage.removeItem("admin_token");
     return <Navigate to="/admin" replace />;
   }

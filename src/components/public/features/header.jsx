@@ -13,7 +13,7 @@ import Button from '@mui/material/Button';
 import pindad from "../../../assets/element/pindad.webp";
 import { BACKEND_URL } from '../../../config/socket';
 
-export default function DoorprizeHeader({ title }) {
+export default function DoorprizeHeader() {
   const [openQr, setOpenQr] = useState(false);
   const [openLogout, setOpenLogout] = useState(false);
   const [userName, setUserName] = useState("User");

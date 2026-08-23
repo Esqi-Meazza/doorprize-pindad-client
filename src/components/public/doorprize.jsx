@@ -50,7 +50,7 @@ export default function DoorprizePage() {
         setData({ title: "DOORPRIZE" });
         setAppState('STANDBY');
       }
-    } catch (error) {
+    } catch {
       setErrorMessage("Gagal terhubung ke server backend.");
       setAppState('ERROR');
     }

@@ -18,7 +18,7 @@ export default function SettingPage() {
 
     setLoading(true);
     try {
-      const response = await fetch(`${BACKEND_URL}}/api/admin/resetevent`, {
+      const response = await fetch(`${BACKEND_URL}/api/admin/resetevent`, {
         method: 'POST',
         headers: authHeader
       });
