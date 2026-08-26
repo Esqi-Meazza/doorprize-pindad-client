@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Picker from "react-mobile-picker";
 import { useNavigate } from "react-router-dom";
 import Snackbar from '@mui/material/Snackbar';
@@ -183,12 +183,12 @@ export default function LandingPage() {
         </Alert>
       </Snackbar>
 
-      <div className="panel-base left">
+      <div className="center-flex relative flex-1 bg-transparent max-md:w-full max-md:h-[50%] max-md:p-9.5">
         <div className="text-left z-1">
-          <h1 className="title-spin font-extrabold text-biru text-[2.8rem] md:text-7xl mb-6">DOORPRIZE</h1>
+          <h1 className="title-spin font-extrabold text-biru text-[2.8rem] md:text-7xl mb-2 md:mb-6">DOORPRIZE</h1>
           <p className="subtitle-spin max-w-full md:max-w-95 font-semibold text-biru text-3 md:text-md mb-5 md:mb-7">Login ke akun mu untuk menguji keburuntungan mu dalam event doorprize dari <strong>PT. Pindad (Persero)</strong></p>
           <button
-          className="btn-sikat rounded-pill animate-bounce" onClick={handleSikatClick}>
+          className="btn-sikat rounded-pill animate-bounce bg-biru text-white cursor-pointer font-extrabold border-none md:mt-5 md:py-4 md:px-12 md:text-[1.5rem] py-2.5 px-5 text-[1.1rem]" onClick={handleSikatClick}>
             Login Sekarang
           </button>
         </div>
@@ -196,10 +196,10 @@ export default function LandingPage() {
 
             {/* PANEL FORM LOGIN */}
 
-      <div className="panel-base right">
+      <div className="center-flex relative flex-1 bg-transparent max-md:w-full max-md:h-[50%] max-md:p-9.5">
         <div className="form-content">
           <button className="btn-kembali" onClick={handelResetClick}>← kembali</button>
-          <h2 className="title-masuk">LOGIN</h2>
+          <h2 className="text-white text-center font-extrabold md:text-[2.5rem] md:mb-7.5 text-[1.2rem] mb-6">LOGIN</h2>
           
           <form onSubmit={handleSubmit} className="register-form">
 
@@ -210,7 +210,7 @@ export default function LandingPage() {
 
               <div className="input-group">
                 <button type="button" className="btn-submit btn-date-picker rounded-pill" onClick={() => setOpen   (true)}>
-                  <span className="btn-date-text">
+                  <span className="text-biru text-[0.88rem] md:text-[1.2rem] font-bold">
                     Tanggal lahir : {value.day} {value.month} {value.year}
                   </span>
                   <CalendarMonthIcon className="input-icon" fontSize="large" />
@@ -320,7 +320,7 @@ export default function LandingPage() {
       </div>
       
       <div className={`panel-overlay ${isActive ? "active" : ""}`}>
-        <img src={orang} alt="Ilustrasi" className="ilustrasi-img"/>
+        <img src={orang} alt="Ilustrasi" className="w-[85%] max-w-80 h-auto z-10 md:w-full md:max-w-150"/>
       </div>
     </div>
   );

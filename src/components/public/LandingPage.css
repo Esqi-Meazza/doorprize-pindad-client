@@ -23,29 +23,7 @@
   background-color: var(--color-biru);
 }
 
-
-  /* PANEL DASAR (Sisi Kiri & Kanan) */
-.panel-base {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  background-color: transparent; 
-}
-
 /* kiri */
-
-.btn-sikat {
-  background-color: var(--color-biru);
-  color: white;
-  margin-top: 20px;
-  border: none;
-  padding: 15px 50px;
-  font-size: 1.5rem;
-  font-weight: 800;
-  cursor: pointer;
-}
 
 .split-container.bg-biru .title-spin,
 .split-container.bg-biru .subtitle-spin,
@@ -80,14 +58,6 @@
 .split-container.bg-putih .btn-kembali {
   opacity: 0;
   pointer-events: none;
-}
-
-.title-masuk {
-  color: white;
-  font-size: 2.5rem;
-  font-weight: 800;
-  margin-bottom: 30px;
-  text-align: center;
 }
 
 .register-form {
@@ -146,12 +116,6 @@
   right: 25px;
   top: 50%;
   transform: translateY(-50%);
-}
-
-.btn-date-text {
-  color: var(--color-biru);
-  font-size: 1.2rem;
-  font-weight: 700;
 }
 
 .btn-submit {
@@ -218,14 +182,6 @@
   border-right: var(--m) solid var(--color-golden);
 }
 
-.ilustrasi-img {
-  width: 100%;
-  max-width: 600px;
-  height: auto;
-  z-index: 11;
-}
-
-
 /* ====================================================
    RESPONSIVE MOBILE (ANDROID / IOS)
    ==================================================== */
@@ -234,35 +190,13 @@
     flex-direction: column;
   }
 
-  .panel-base {
-    width: 100%;
-    height: 50%;
-    padding: 38px;   
-    box-sizing: border-box;
-  }
-
   /* --- PENYESUAIAN SISI CTA (SPIN WHEEL) --- */
-  .btn-sikat {
-    padding: 10px 30px; 
-    font-size: 1.1rem;
-  }
 
   /* --- PENYESUAIAN SISI FORM (MASUK CUNG) --- */
   .form-content {
     width: 100%;
     max-width: 280px;
     margin-top: 0;}
-
-  .panel-base.right {
-    justify-content: center;
-    align-items: center;
-    padding-top: 0;
-  }
-
-  .title-masuk {
-    font-size: 1.2rem; /* Dikecilkan dari 2.5rem */
-    margin-bottom: var(--m);
-  }
 
   .register-form {
     gap: var(--s); /* Jarak antar input dipersempit */
@@ -290,12 +224,6 @@
   transform: translateY(-50%);
 }
 
-.btn-date-text {
-  color: var(--color-biru);
-  font-size: 0.88rem;
-  font-weight: 700;
-}
-
   .btn-submit {
     padding: var(--s) var(--m);
     font-size: 1rem;
@@ -316,11 +244,6 @@
     
     transition: transform var(--duration) cubic-bezier(0.77, 0, 0.175, 1), 
                 background-color var(--duration) ease, border-radius var(--duration) ease;
-  }
-
-  .ilustrasi-img {
-    width: 85%;
-    max-width: 320px;
   }
 
   .panel-overlay.active {
