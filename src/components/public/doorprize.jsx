@@ -4,9 +4,9 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 
-import DoorprizeBackground from './features/background.jsx';
+import DoorprizeBackground from './features/Background.jsx';
 import DoorprizeHeader from './features/header.jsx';
-import StandbyStage from './features/standby.jsx';
+import StandbyStage from './features/Standbye.jsx';
 import Grid from './features/boxgrid.jsx'; 
 import { socket, BACKEND_URL } from '../../config/socket.js'; 
 

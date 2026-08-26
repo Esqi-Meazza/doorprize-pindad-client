@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import DynamicSlotGrid from '../../public/features/boxgrid'; 
-import soundUrl from '../../../assets/element/Sound.mp3';
-import winSoundUrl from '../../../assets/element/win.mp3';
+import soundUrl from '../../../assets/audio/Sound.mp3';
+import winSoundUrl from '../../../assets/audio/win.mp3';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import StopIcon from '@mui/icons-material/Stop';
 import ReplayIcon from '@mui/icons-material/Replay';

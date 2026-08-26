@@ -185,8 +185,8 @@ export default function LandingPage() {
 
       <div className="panel-base left">
         <div className="text-left z-1">
-          <h1 className="title-spin">DOORPRIZE</h1>
-          <p className="subtitle-spin">Login ke akun mu untuk menguji keburuntungan mu dalam event doorprize dari <strong>PT. Pindad (Persero)</strong></p>
+          <h1 className="title-spin font-extrabold text-biru text-[2.8rem] md:text-7xl mb-6">DOORPRIZE</h1>
+          <p className="subtitle-spin max-w-full md:max-w-95 font-semibold text-biru text-3 md:text-md mb-5 md:mb-7">Login ke akun mu untuk menguji keburuntungan mu dalam event doorprize dari <strong>PT. Pindad (Persero)</strong></p>
           <button
           className="btn-sikat rounded-pill animate-bounce" onClick={handleSikatClick}>
             Login Sekarang

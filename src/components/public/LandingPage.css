@@ -1,8 +1,4 @@
 :root {
-  --color-biru: #08415c;
-  --color-golden: #b39c4d;
-  --color-white: #ffffff;
-  --color-oil: #474b24;
   --duration:0.7s;
   --s:8px;
   --m:16px;
@@ -12,7 +8,7 @@
 /* CONTAINER UTAMA */
 .split-container {
   position: relative;
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   display: flex;
   overflow: hidden;
@@ -20,7 +16,7 @@
 }
 
 .split-container.bg-putih {
-  background-color: var(--color-white);
+  background-color: white;
 }
 
 .split-container.bg-biru {
@@ -40,28 +36,9 @@
 
 /* kiri */
 
-.title-spin {
-  font-size: 4rem;
-  line-height: 1.1;
-  color: var(--color-biru);
-  margin-bottom: var(--m);
-  font-weight: 800;
-}
-
-.subtitle-spin {
-  color: var(--color-biru);
-  font-size: 0.9rem;
-  font-weight: 500;
-  line-height: 1.2;
-  margin-top: 0;
-  margin-bottom: var(--l);
-  max-width: 380px; 
-  transition: opacity 0.3s ease;
-}
-
 .btn-sikat {
   background-color: var(--color-biru);
-  color: var(--color-white);
+  color: white;
   margin-top: 20px;
   border: none;
   padding: 15px 50px;
@@ -88,7 +65,7 @@
 .btn-kembali {
   background-color: var(--color-biru);
   mix-blend-mode: difference;
-  color: var(--color-white);
+  color: white;
   border: none;
   font-size: 0.88rem;
   font-weight: 600;
@@ -100,8 +77,13 @@
   opacity: 0.9;
 }
 
+.split-container.bg-putih .btn-kembali {
+  opacity: 0;
+  pointer-events: none;
+}
+
 .title-masuk {
-  color: var(--color-white);
+  color: white;
   font-size: 2.5rem;
   font-weight: 800;
   margin-bottom: 30px;
@@ -120,9 +102,9 @@
   align-items: center;
 }
 
-.input-group input, .input-group input-field {
+.input-group input {
   width: 100%;
-  background-color: var(--color-white);
+  background-color: white;
   border: none;
   border-radius: 50px;
   padding: 15px 65px 15px 25px; 
@@ -141,7 +123,7 @@
 .input-icon {
   position: absolute;
   right: 25px;
-  color: var(--color-oil);
+  color: var(--color-olive);
   pointer-events: none;
   display: flex;
   align-items: center;
@@ -173,7 +155,7 @@
 }
 
 .btn-submit {
-  background-color: var(--color-white);
+  background-color: white;
   color: var(--color-biru);
   border: none;
   padding: 15px;
@@ -186,12 +168,12 @@
 
 .btn-submit:hover {
   transform: translateY(-2px);
-  box-shadow: 1px 1px 0px var(--color-oil),
-                2px 2px 0px var(--color-oil),
-                3px 3px 0px var(--color-oil),
-                4px 4px 0px var(--color-oil),
-                5px 5px 0px var(--color-oil),
-                6px 6px 0px var(--color-oil);
+  box-shadow: 1px 1px 0px var(--color-olive),
+                2px 2px 0px var(--color-olive),
+                3px 3px 0px var(--color-olive),
+                4px 4px 0px var(--color-olive),
+                5px 5px 0px var(--color-olive),
+                6px 6px 0px var(--color-olive);
 }
 
 .btn-submit:active {
@@ -228,7 +210,7 @@
   transform: translateX(-100%);
   
   /* Warna berubah jadi Putih */
-  background-color: var(--color-white);
+  background-color: white;
   
   /* Bentuk Berubah: Melengkung dan bergaris emas di KANAN */
   border-radius: 0 80px 80px 0;
@@ -241,14 +223,13 @@
   max-width: 600px;
   height: auto;
   z-index: 11;
-  transition: transform 0.3s ease;
 }
 
 
 /* ====================================================
    RESPONSIVE MOBILE (ANDROID / IOS)
    ==================================================== */
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 769px) {
   .split-container {
     flex-direction: column;
   }
@@ -261,17 +242,6 @@
   }
 
   /* --- PENYESUAIAN SISI CTA (SPIN WHEEL) --- */
-  .title-spin {
-    font-size: 2.8rem; 
-    margin-bottom: var(--l);
-  }
-
-  .subtitle-spin {
-    font-size: 0.85rem; 
-    margin-bottom: var(--l);
-    max-width: 100%;
-  }
-
   .btn-sikat {
     padding: 10px 30px; 
     font-size: 1.1rem;
@@ -280,17 +250,13 @@
   /* --- PENYESUAIAN SISI FORM (MASUK CUNG) --- */
   .form-content {
     width: 100%;
-    max-width: 280px; /* Membatasi lebar form di HP */
-  }
+    max-width: 280px;
+    margin-top: 0;}
 
   .panel-base.right {
     justify-content: center;
     align-items: center;
     padding-top: 0;
-  }
-
-  .form-content {
-    margin-top: 0;
   }
 
   .title-masuk {
@@ -360,7 +326,7 @@
   .panel-overlay.active {
     height: 52%;
     transform: translateY(-100%);
-    background-color: var(--color-white);
+    background-color: white;
     border-radius: 0 0 40px 40px;
     border-right: none;
     border-bottom: 8px solid var(--color-golden);
