@@ -169,7 +169,7 @@ export default function LandingPage() {
 
         // BAGIAN SPLIT CONTAINER (KIRI + KANAN)
 
-    <div className={`split-container ${isActive ? "bg-biru" : "bg-putih"}`}>
+    <div className={`relative w-full h-screen flex overflow-hidden smooth-transition max-md:flex-col ${isActive ? "bg-biru" : "bg-white"}`}>
       <img src={pindad} alt="Logo Pindad" className="absolute z-20 w-11 lg:w-20 top-6 left-4 lg:top-12 lg:left-9" />
       
       <Snackbar 
@@ -188,7 +188,7 @@ export default function LandingPage() {
           <h1 className="title-spin font-extrabold text-biru text-[2.8rem] md:text-7xl mb-2 md:mb-6">DOORPRIZE</h1>
           <p className="subtitle-spin max-w-full md:max-w-95 font-semibold text-biru text-3 md:text-md mb-5 md:mb-7">Login ke akun mu untuk menguji keburuntungan mu dalam event doorprize dari <strong>PT. Pindad (Persero)</strong></p>
           <button
-          className="btn-sikat rounded-pill animate-bounce bg-biru text-white cursor-pointer font-extrabold border-none md:mt-5 md:py-4 md:px-12 md:text-[1.5rem] py-2.5 px-5 text-[1.1rem]" onClick={handleSikatClick}>
+          className="btn-sikat rounded-pill animate-bounce bg-biru text-white cursor-pointer font-extrabold border-none md:mt-5 md:py-4 md:px-12 md:text-2xl py-2.5 px-5 text-[1.1rem]" onClick={handleSikatClick}>
             Login Sekarang
           </button>
         </div>
@@ -196,12 +196,15 @@ export default function LandingPage() {
 
             {/* PANEL FORM LOGIN */}
 
-      <div className="center-flex relative flex-1 bg-transparent max-md:w-full max-md:h-[50%] max-md:p-9.5">
-        <div className="form-content">
-          <button className="btn-kembali" onClick={handelResetClick}>← kembali</button>
-          <h2 className="text-white text-center font-extrabold md:text-[2.5rem] md:mb-7.5 text-[1.2rem] mb-6">LOGIN</h2>
+      <div className={`center-flex relative flex-1 bg-transparent max-md:w-full max-md:h-[50%] max-md:p-9.5`}>
+        <div className="w-full max-w-70 md:max-w-100 z-1 ">
+          <button className={`btn-kembali bg-biru text-white font-semibold cursor-pointer text-sm  ${isActive
+      ? "opacity-100 pointer-events-auto"
+      : "opacity-0 pointer-events-none"
+    }`} onClick={handelResetClick}>← kembali</button>
+          <h2 className="text-white text-center font-extrabold md:text-[2.5rem] md:mb-7.5 text-xl mb-6">LOGIN</h2>
           
-          <form onSubmit={handleSubmit} className="register-form">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-2 md:gap-5">
 
             <div className="input-group">
               <input type="text" placeholder="NIP" value={nip} onChange={(e) => setNip(e.target.value)} required />
@@ -209,8 +212,8 @@ export default function LandingPage() {
             </div>
 
               <div className="input-group"> 
-                <button type="button" className="btn-submit btn-date-picker rounded-pill bg-white text-biru cursor-pointer font-extrabold active:scale-95 md:p-4 md:text-[1.2rem] md:mt-2.5 p-2.5 text-md mt-1.5" onClick={() => setOpen   (true)}>
-                  <span className="text-biru text-[0.88rem] md:text-[1.2rem] font-bold">
+                <button type="button" className="btn-submit btn-date-picker rounded-pill bg-white text-biru cursor-pointer font-extrabold active:scale-99 smooth-transition md:p-4 md:text-xl md:mt-2.5 p-2.5 text-sm mt-1.5" onClick={() => setOpen   (true)}>
+                  <span className="text-biru text-sm md:text-xl font-bold">
                     Tanggal lahir : {value.day} {value.month} {value.year}
                   </span>
                   <CalendarMonthIcon className="input-icon" fontSize="large" />
@@ -311,15 +314,14 @@ export default function LandingPage() {
             <Diversity3Icon className="input-icon" fontSize="large"/>
           </div>
 
-            <button type="submit" className="btn-submit bg-white text-biru cursor-pointer font-extrabold rounded-pill active:scale-95 md:p-4 md:text-[1.2rem] md:mt-2.5 p-2.5 text-md mt-1.5" disabled={isLoadingSubmit}>
+            <button type="submit" className="btn-submit bg-white text-biru cursor-pointer font-extrabold rounded-pill active:scale-95 md:text-xl md:mt-2.5 p-2.5 text-md mt-1.5 hover:border-golden border-4 border-white hover:border-4 smooth-transition" disabled={isLoadingSubmit}>
               {isLoadingSubmit ? "MENYIMPAN DATA..." : "LOGIN SEKARANG"}
             </button>
           </form>
 
         </div>
       </div>
-      
-      <div className={`panel-overlay ${isActive ? "active" : ""}`}>
+            <div className={`panel-overlay ${isActive ? "active" : ""}`}>
         <img src={orang} alt="Ilustrasi" className="w-[85%] max-w-80 h-auto z-10 md:w-full md:max-w-150"/>
       </div>
     </div>

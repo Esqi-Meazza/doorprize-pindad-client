@@ -5,67 +5,6 @@
   --l:24px;
 }
 
-/* CONTAINER UTAMA */
-.split-container {
-  position: relative;
-  width: 100%;
-  height: 100vh;
-  display: flex;
-  overflow: hidden;
-  transition: background-color var(--duration) ease; 
-}
-
-.split-container.bg-putih {
-  background-color: white;
-}
-
-.split-container.bg-biru {
-  background-color: var(--color-biru);
-}
-
-/* kiri */
-
-.split-container.bg-biru .title-spin,
-.split-container.bg-biru .subtitle-spin,
-.split-container.bg-biru .btn-sikat {
-  opacity: 0;
-  pointer-events: none;
-}
-
-
-/* KONTEN FORM (Kanan) */
-.form-content {
-    width: 100%;
-    max-width: 400px;
-    z-index: 1;
-}
-
-.btn-kembali {
-  background-color: var(--color-biru);
-  mix-blend-mode: difference;
-  color: white;
-  border: none;
-  font-size: 0.88rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.3s ease;
-}
-
-.btn-kembali:hover {
-  opacity: 0.9;
-}
-
-.split-container.bg-putih .btn-kembali {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.register-form {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
 .input-group {
   position: relative;
   display: flex;
@@ -118,11 +57,9 @@
   transform: translateY(-50%);
 }
 
-/*SLIDING OVERLAY PANEL*/
 .panel-overlay {
   position: absolute;
   top: 0;
-  /* Posisi awal: Nempel di KANAN (menutupi form) */
   right: 0; 
   width: 50%;
   height: 100%;
@@ -131,57 +68,34 @@
   justify-content: center;
   align-items: center;
   z-index: 10;
-  
-  /* Bentuk Awal: Melengkung dan bergaris emas di KIRI */
   border-radius: 80px 0 0 80px;
   border-left: var(--m) solid var(--color-golden);
   
-  /* Transisi Mulus untuk perpindahan, warna, dan border */
   transition: transform var(--duration) cubic-bezier(0.77, 0, 0.175, 1), 
               background-color var(--duration) ease, 
               border-radius var(--duration) ease;
 }
 
-/* STATE AKTIF (Tombol SIKATTT Diklik) */
 .panel-overlay.active {
-  /* Pindah ke KIRI */
   transform: translateX(-100%);
-  
-  /* Warna berubah jadi Putih */
   background-color: white;
-  
-  /* Bentuk Berubah: Melengkung dan bergaris emas di KANAN */
   border-radius: 0 80px 80px 0;
   border-left: none;
   border-right: var(--m) solid var(--color-golden);
 }
 
+
 /* ====================================================
    RESPONSIVE MOBILE (ANDROID / IOS)
    ==================================================== */
-@media screen and (max-width: 769px) {
-  .split-container {
-    flex-direction: column;
-  }
+@media screen and (max-width: 768px) {
 
-  /* --- PENYESUAIAN SISI CTA (SPIN WHEEL) --- */
-
-  /* --- PENYESUAIAN SISI FORM (MASUK CUNG) --- */
-  .form-content {
-    width: 100%;
-    max-width: 280px;
-    margin-top: 0;}
-
-  .register-form {
-    gap: var(--s); /* Jarak antar input dipersempit */
-  }
 
   .input-group input {
     padding: var(--s) var(--m);
     font-size: 0.88rem;
   }
 
-  /* Icon dalam input ikut disesuaikan ukurannya */
   .input-icon {
     font-size: 1.5rem !important;
     right: 15px;
@@ -198,30 +112,25 @@
   transform: translateY(-50%);
 }
 
-  /* --- PENYESUAIAN ILUSTRASI & OVERLAY --- */
   .panel-overlay {
     width: 100%;
     height: 50%;
     top: auto;
     bottom: 0;
     right: auto;
-    background-color: var(--color-biru);
     border-radius: 40px 40px 0 0;
     border-left: none;
-    border-top: 8px solid var(--color-golden); /* Garis emas dibuat lebih tipis di HP */
-    
+    border-top: 8px solid var(--color-golden);
     transition: transform var(--duration) cubic-bezier(0.77, 0, 0.175, 1), 
                 background-color var(--duration) ease, border-radius var(--duration) ease;
   }
 
-  .panel-overlay.active {
+    .panel-overlay.active {
     height: 52%;
     transform: translateY(-100%);
-    background-color: white;
     border-radius: 0 0 40px 40px;
     border-right: none;
     border-bottom: 8px solid var(--color-golden);
   }
-
 
 }
