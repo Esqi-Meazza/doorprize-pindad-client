@@ -17,6 +17,27 @@ import orang from "../../assets/element/orang.webp";
 import "./landingPage.css"; 
 import { BACKEND_URL } from "../../config/socket.js";
 
+  const inputIconSx = {
+    position: 'absolute',
+    right: 25,
+    color: 'var(--color-olive)',
+    pointerEvents: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+
+    '@media (max-width: 768px)': {
+      fontSize: '1.5rem !important',
+      right: 15,
+    },
+  };
+
+  const inputBaseClass =
+  "w-full bg-white border-none rounded-pill pt-4 pb-4 pl-6 pr-16.5" +
+  "text-xl font-bold text-biru outline-none [font-family:inherit] box-border " +
+  "placeholder:text-biru " +
+  "max-md:py-2 max-md:px-4 max-md:text-sm";
+
 const years = Array.from({ length: 100 }, (_, i) => `${2026 - i}`);
 const monthMap = {
   Jan: "01", Feb: "02", Mar: "03", Apr: "04", Mei: "05", Jun: "06",
@@ -27,6 +48,7 @@ const days = Array.from({ length: 31 }, (_, i) =>
 );
 
 export default function LandingPage() {
+
   const [isActive, setIsActive] = useState(() => {
     const savedState = sessionStorage.getItem("page_is_active");
     return savedState === "true"; 
@@ -206,18 +228,24 @@ export default function LandingPage() {
           
           <form onSubmit={handleSubmit} className="flex flex-col gap-2 md:gap-5">
 
-            <div className="input-group">
-              <input type="text" placeholder="NIP" value={nip} onChange={(e) => setNip(e.target.value)} required />
-              <BadgeOutlinedIcon className="input-icon" fontSize="large"/>
+            <div className="input-group relative flex items-center">
+              <input type="text" placeholder="NIP" value={nip} onChange={(e) => setNip(e.target.value)} className={inputBaseClass} required />
+              <BadgeOutlinedIcon sx={inputIconSx} fontSize="large"/>
             </div>
 
-              <div className="input-group"> 
-                <button type="button" className="btn-submit btn-date-picker rounded-pill bg-white text-biru cursor-pointer font-extrabold active:scale-99 smooth-transition md:p-4 md:text-xl md:mt-2.5 p-2.5 text-sm mt-1.5" onClick={() => setOpen   (true)}>
-                  <span className="text-biru text-sm md:text-xl font-bold">
-                    Tanggal lahir : {value.day} {value.month} {value.year}
-                  </span>
-                  <CalendarMonthIcon className="input-icon" fontSize="large" />
-                </button>
+            <div className="input-group relative flex items-center"> 
+              <button type="button" className="
+              btn-submit btn-date-picker rounded-pill w-full
+              flex items-center justify-self-start text-left relative
+              md:p-4 p-2.5 bg-white text-biru 
+              cursor-pointer active:scale-99 smooth-transition
+              " 
+              onClick={() => setOpen   (true)}>
+                <span className="text-biru text-sm md:text-md font-bold">
+                  Tanggal lahir : {value.day} {value.month} {value.year}
+                </span>
+                <CalendarMonthIcon fontSize="large" sx={{position: 'absolute', color: 'var(--color-olive)', right: 25, top: '50%', transform: 'translateY(-50%)', '@media (max-width: 768px)': {right: 16, fontSize: '1.5rem'},}}/>
+              </button>
             </div>
 
               <Drawer
@@ -269,13 +297,14 @@ export default function LandingPage() {
                 </Box>
               </Drawer>
 
-            <div className="input-group" style={{ position: 'relative' }}>
+            <div className="input-group relative flex items-center" style={{ position: 'relative' }}>
             <input 
               type="text" 
               placeholder={isAutofillLoading ? "" : "Nama (Otomatis)"} 
               value={nama}
               required
               readOnly 
+              className={inputBaseClass}
             />
             
             {isAutofillLoading && (
@@ -288,16 +317,17 @@ export default function LandingPage() {
               </div>
             )}
 
-            <PersonIcon className="input-icon" fontSize="large"/>
+            <PersonIcon sx={inputIconSx} fontSize="large"/>
           </div>
 
-                    <div className="input-group" style={{ position: 'relative' }}>
+                    <div className="input-group relative flex items-center">
             <input 
               type="text" 
               placeholder={isAutofillLoading ? "" : "Divisi (Otomatis)"} 
               value={divisi}
               required
               readOnly 
+              className={inputBaseClass}
             />
             
             {/* TRIK OVERLAY untuk Divisi */}
@@ -311,7 +341,7 @@ export default function LandingPage() {
               </div>
             )}
 
-            <Diversity3Icon className="input-icon" fontSize="large"/>
+            <Diversity3Icon sx={inputIconSx} fontSize="large"/>
           </div>
 
             <button type="submit" className="btn-submit bg-white text-biru cursor-pointer font-extrabold rounded-pill active:scale-95 md:text-xl md:mt-2.5 p-2.5 text-md mt-1.5 hover:border-golden border-4 border-white hover:border-4 smooth-transition" disabled={isLoadingSubmit}>

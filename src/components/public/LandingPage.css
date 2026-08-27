@@ -1,60 +1,6 @@
 :root {
   --duration:0.7s;
-  --s:8px;
   --m:16px;
-  --l:24px;
-}
-
-.input-group {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.input-group input {
-  width: 100%;
-  background-color: white;
-  border: none;
-  border-radius: 50px;
-  padding: 15px 65px 15px 25px; 
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--color-biru);
-  outline: none;
-  font-family: inherit;
-  box-sizing: border-box; 
-}
-
-.input-group input::placeholder {
-  color: var(--color-biru);
-}
-
-.input-icon {
-  position: absolute;
-  right: 25px;
-  color: var(--color-olive);
-  pointer-events: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.input-group .btn-submit {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 15px 65px 15px 25px;
-  text-align: left;
-  position: relative;
-  margin-top: 0;
-}
-
-.input-group .btn-submit .input-icon {
-  position: absolute;
-  right: 25px;
-  top: 50%;
-  transform: translateY(-50%);
 }
 
 .panel-overlay {
@@ -89,28 +35,6 @@
    RESPONSIVE MOBILE (ANDROID / IOS)
    ==================================================== */
 @media screen and (max-width: 768px) {
-
-
-  .input-group input {
-    padding: var(--s) var(--m);
-    font-size: 0.88rem;
-  }
-
-  .input-icon {
-    font-size: 1.5rem !important;
-    right: 15px;
-  }
-
-  .input-group .btn-submit {
-  padding: var(--s) var(--m);
-}
-
-.input-group .btn-submit .input-icon {
-  position: absolute;
-  right: var(--m);
-  top: 50%;
-  transform: translateY(-50%);
-}
 
   .panel-overlay {
     width: 100%;
