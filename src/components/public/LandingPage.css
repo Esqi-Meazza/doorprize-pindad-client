@@ -118,32 +118,6 @@
   transform: translateY(-50%);
 }
 
-.btn-submit {
-  background-color: white;
-  color: var(--color-biru);
-  border: none;
-  padding: 15px;
-  font-size: 1.2rem;
-  font-weight: 800;
-  cursor: pointer;
-  margin-top: 10px;
-  transition: all 0.3s ease;
-}
-
-.btn-submit:hover {
-  transform: translateY(-2px);
-  box-shadow: 1px 1px 0px var(--color-olive),
-                2px 2px 0px var(--color-olive),
-                3px 3px 0px var(--color-olive),
-                4px 4px 0px var(--color-olive),
-                5px 5px 0px var(--color-olive),
-                6px 6px 0px var(--color-olive);
-}
-
-.btn-submit:active {
-  transform: scale(0.97);
-}
-
 /*SLIDING OVERLAY PANEL*/
 .panel-overlay {
   position: absolute;
@@ -223,12 +197,6 @@
   top: 50%;
   transform: translateY(-50%);
 }
-
-  .btn-submit {
-    padding: var(--s) var(--m);
-    font-size: 1rem;
-    margin-top: 5px;
-  }
 
   /* --- PENYESUAIAN ILUSTRASI & OVERLAY --- */
   .panel-overlay {

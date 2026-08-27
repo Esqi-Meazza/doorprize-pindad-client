@@ -208,8 +208,8 @@ export default function LandingPage() {
               <BadgeOutlinedIcon className="input-icon" fontSize="large"/>
             </div>
 
-              <div className="input-group">
-                <button type="button" className="btn-submit btn-date-picker rounded-pill" onClick={() => setOpen   (true)}>
+              <div className="input-group"> 
+                <button type="button" className="btn-submit btn-date-picker rounded-pill bg-white text-biru cursor-pointer font-extrabold active:scale-95 md:p-4 md:text-[1.2rem] md:mt-2.5 p-2.5 text-md mt-1.5" onClick={() => setOpen   (true)}>
                   <span className="text-biru text-[0.88rem] md:text-[1.2rem] font-bold">
                     Tanggal lahir : {value.day} {value.month} {value.year}
                   </span>
@@ -311,7 +311,7 @@ export default function LandingPage() {
             <Diversity3Icon className="input-icon" fontSize="large"/>
           </div>
 
-            <button type="submit" className="btn-submit rounded-pill" disabled={isLoadingSubmit}>
+            <button type="submit" className="btn-submit bg-white text-biru cursor-pointer font-extrabold rounded-pill active:scale-95 md:p-4 md:text-[1.2rem] md:mt-2.5 p-2.5 text-md mt-1.5" disabled={isLoadingSubmit}>
               {isLoadingSubmit ? "MENYIMPAN DATA..." : "LOGIN SEKARANG"}
             </button>
           </form>
