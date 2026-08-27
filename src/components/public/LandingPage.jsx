@@ -14,7 +14,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import Diversity3Icon from '@mui/icons-material/Diversity3';
 import pindad from "../../assets/element/pindad.webp";
 import orang from "../../assets/element/orang.webp";
-import "./landingPage.css"; 
+import "../../SlidingAnimation.css"; 
 import { BACKEND_URL } from "../../config/socket.js";
 
   const inputIconSx = {
