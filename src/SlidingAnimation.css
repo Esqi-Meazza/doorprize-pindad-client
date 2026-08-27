@@ -30,10 +30,6 @@
   border-right: var(--m) solid var(--color-golden);
 }
 
-
-/* ====================================================
-   RESPONSIVE MOBILE (ANDROID / IOS)
-   ==================================================== */
 @media screen and (max-width: 768px) {
 
   .panel-overlay {
