@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
@@ -7,7 +7,7 @@ import Button from '@mui/material/Button';
 import DoorprizeBackground from './features/Background.jsx';
 import DoorprizeHeader from './features/header.jsx';
 import StandbyStage from './features/Standbye.jsx';
-import Grid from './features/boxgrid.jsx'; 
+import Grid from '../Boxgrid.jsx'; 
 import { socket, BACKEND_URL } from '../../config/socket.js'; 
 
 export default function DoorprizePage() {

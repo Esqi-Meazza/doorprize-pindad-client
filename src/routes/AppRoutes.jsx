@@ -3,7 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import LandingPage from "../components/public/LandingPage.jsx";
 import DoorPrize from "../components/public/Doorprize.jsx";
 // universal
-import Grid from "../components/public/features/boxgrid.jsx";
+import Grid from "../components/Boxgrid.jsx";
 // panitia
 import ProtectedRoute from "./ProtectedRoute.jsx";
 import Login from "../components/admin/Login.jsx";

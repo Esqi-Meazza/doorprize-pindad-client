@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import DynamicSlotGrid from '../../public/features/boxgrid'; 
+import { useState, useEffect, useRef } from 'react';
+import DynamicSlotGrid from '../../Boxgrid'; 
 import soundUrl from '../../../assets/audio/Sound.mp3';
 import winSoundUrl from '../../../assets/audio/win.mp3';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
