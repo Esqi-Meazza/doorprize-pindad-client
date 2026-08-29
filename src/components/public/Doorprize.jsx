@@ -1,20 +1,21 @@
 import { useState, useEffect } from 'react';
-import CircularProgress from '@mui/material/CircularProgress';
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
-import Button from '@mui/material/Button';
+import { socket, BACKEND_URL } from '../../config/socket.js'; 
+import useSnackbar from '../../hooks/useSnackbar.js';
+import AppSnackbar from '../ui/AppSnackbar.jsx';
 
+import CircularProgress from '@mui/material/CircularProgress';
+import Button from '@mui/material/Button';
 import DoorprizeBackground from './features/Background.jsx';
 import DoorprizeHeader from './features/header.jsx';
 import StandbyStage from './features/Standbye.jsx';
 import Grid from '../Boxgrid.jsx'; 
-import { socket, BACKEND_URL } from '../../config/socket.js'; 
 
 export default function DoorprizePage() {
   // 1. STATE UTAMA APLIKASI
   const [appState, setAppState] = useState('LOADING'); // LOADING | ERROR | STANDBY | SPINNING | RESULT | COMPLETED
   const [data, setData] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
+  const { snackbar, showSnackbar, closeSnackbar } = useSnackbar();
 
   // 2. STATE SOCKET & DATA UNDIAN
   const [sessionData, setSessionData] = useState({ mode: '', jumlah_slot: 0, title: 'DOORPRIZE' });
@@ -64,6 +65,17 @@ export default function DoorprizePage() {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  useEffect(() => {
+    if (appState === 'ERROR' && errorMessage) {
+      showSnackbar({
+        message: errorMessage,
+        severity: 'error',
+        anchorOrigin: { vertical: 'top', horizontal: 'center' },
+        duration: 4000,
+      });
+    }
+  }, [appState, errorMessage, showSnackbar]);
 
   // -- LISTENER SOCKET.IO --
   useEffect(() => {
@@ -131,9 +143,14 @@ export default function DoorprizePage() {
   if (appState === 'ERROR') {
     return (
       <div className="fixed inset-0 flex flex-col items-center justify-center bg-white z-9999">
-        <Snackbar open={true} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
-          <Alert severity="error" variant="filled">{errorMessage}</Alert>
-        </Snackbar>
+        <AppSnackbar
+          open={snackbar.open}
+          message={snackbar.message}
+          severity={snackbar.severity}
+          anchorOrigin={snackbar.anchorOrigin}
+          duration={snackbar.duration}
+          onClose={closeSnackbar}
+        />
         <h2 className="text-biru mb-4 text-2xl font-bold">Sistem Mengalami Gangguan</h2>
         <Button variant="contained" onClick={fetchData} sx={{ backgroundColor: '#08415c' }}>
           Coba Lagi (Retry)

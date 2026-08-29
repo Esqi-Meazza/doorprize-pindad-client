@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { BACKEND_URL } from '../../config/socket.js';
+import useSnackbar from "../../hooks/useSnackbar.js";
+import AppSnackbar from "../ui/AppSnackbar.jsx";
+
 import PersonIcon from '@mui/icons-material/Person';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
 import loginBackground from '../../assets/element/loginBackground.webp';
-import { BACKEND_URL } from '../../config/socket.js';
 
 export default function AdminLogin() {
   const [username, setUsername] = useState(() => {
@@ -16,7 +17,7 @@ export default function AdminLogin() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+  const { snackbar, showSnackbar, closeSnackbar } = useSnackbar();
 
   const navigate = useNavigate();
 
@@ -29,8 +30,7 @@ export default function AdminLogin() {
   }, [password]);
 
   const handleLogin = async (e) => {
-    e.preventDefault(); 
-    setSnackbar({ open: false, message: "", severity: "info" });
+    e.preventDefault();
     setIsLoading(true);
 
     try {
@@ -44,15 +44,26 @@ export default function AdminLogin() {
 
       if (response.ok) {
       localStorage.setItem("admin_token", data.token); 
-      setSnackbar({ open: true, message: "Login berhasil!", severity: "success" });
+      showSnackbar({
+        message: "login Berhasil!",
+        anchorOrigin: { vertical: 'top', horizontal: 'center' },
+      });
       sessionStorage.removeItem("login_username");
       sessionStorage.removeItem("login_password");
       navigate("/admin/dashboard"); 
     } else {
-      setSnackbar({ open: true, message: data.error, severity: "error" });
+      showSnackbar({
+        message: data.error,
+        severity: "error",
+        anchorOrigin: { vertical: 'top', horizontal: 'center'}
+      })
     }
   } catch {
-    setSnackbar({ open: true, message: "Gagal terhubung ke server. Pastikan server menyala.", severity: "warning" });
+    showSnackbar({
+      message: "Gagal terhubung ke server. Pastikan server menyala!",
+      severity: "warning",
+      anchorOrigin: { vertical: 'top', horizontal: 'center'}
+    })
   } finally {
     setIsLoading(false); 
   }
@@ -64,16 +75,17 @@ export default function AdminLogin() {
       style={{ backgroundImage: `url(${loginBackground})` }}
     >
 
-      <Snackbar 
-        open={snackbar.open} 
-        autoHideDuration={4000} 
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }} 
-      >
-          <Alert severity={snackbar.severity} variant="filled" sx={{ width: '100%', borderRadius: '50px' }}>
-            {snackbar.message}
-          </Alert>
-      </Snackbar>
+      <AppSnackbar
+        open={snackbar.open}
+        message={snackbar.message}
+        severity={snackbar.severity}
+        anchorOrigin={snackbar.anchorOrigin}
+        duration={snackbar.duration}
+        onClose={closeSnackbar}
+        sx={{
+          width: 'auto'
+        }}
+      />
 
       <div
         className="

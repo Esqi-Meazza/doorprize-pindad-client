@@ -24,7 +24,11 @@ export default function AppSnackbar({
                 severity={severity}
                 variant="filled"
                 onClose={onClose}
-                sx={sx}
+                sx={{
+                    width: "100%",
+                    borderRadius: "50px",
+                    ...sx
+                }}
             >
                 {message}
             </Alert>

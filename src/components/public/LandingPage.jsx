@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import Picker from "react-mobile-picker";
 import { useNavigate } from "react-router-dom";
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
+import AppSnackbar from "../../components/ui/AppSnackbar";
+import useSnackbar from "../../hooks/useSnackbar";
+import { BACKEND_URL } from "../../config/socket.js";
 import Button from '@mui/material/Button';
 import Drawer from "@mui/material/Drawer";
 import Typography from "@mui/material/Typography";
@@ -15,7 +16,6 @@ import Diversity3Icon from '@mui/icons-material/Diversity3';
 import pindad from "../../assets/element/pindad.webp";
 import orang from "../../assets/element/orang.webp";
 import "../../SlidingAnimation.css"; 
-import { BACKEND_URL } from "../../config/socket.js";
 
   const inputIconSx = {
     position: 'absolute',
@@ -70,7 +70,7 @@ export default function LandingPage() {
 
   const [isAutofillLoading, setIsAutofillLoading] = useState(false);
   const [isLoadingSubmit, setIsLoadingSubmit] = useState(false);
-  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+  const { snackbar, showSnackbar, closeSnackbar } = useSnackbar();
 
   const navigate = useNavigate();
 
@@ -115,16 +115,27 @@ export default function LandingPage() {
           if (response.ok) {
             setNama(resData.data.nama_lengkap);
             setDivisi(resData.data.nama_divisi);
-            setSnackbar({ open: true, message: `Halo, ${resData.data.nama_lengkap}!`, severity: "success" });
+            showSnackbar({
+              message: `Halo, ${resData.data.nama_lengkap}!`,
+              anchorOrigin: { vertical: 'top', horizontal: 'center' },
+            });
           } else {
             setNama("Data tidak ditemukan");
             setDivisi("Data tidak ditemukan");
-            setSnackbar({ open: true, message: "NIP/Tanggal lahir tidak ditemukan", severity: "warning" });
+            showSnackbar({
+              message: "NIP/Tanggal lahir tidak ditemukan",
+              severity: "warning",
+              anchorOrigin: { vertical: 'top', horizontal: 'center' },
+            });
           }
         } catch {
           setNama("Gagal terhubung ke server");
           setDivisi("Gagal terhubung ke server");
-          setSnackbar({ open: true, message: "Terjadi kesalahan server!", severity: "error" });
+          showSnackbar({
+            message: "Terjadi kesalahan server!",
+            severity: "error",
+            anchorOrigin: { vertical: 'top', horizontal: 'center' },
+          });
         } finally {
           setIsAutofillLoading(false);
         }
@@ -139,14 +150,18 @@ export default function LandingPage() {
     }, 350);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [nip, tgl_lahir]); 
+  }, [nip, tgl_lahir, showSnackbar]); 
 
   // LOGIKA SUBMIT
   const handleSubmit = async (e) => {
   e.preventDefault();
 
   if (nama === "Data tidak ditemukan" || !nama) {
-    setSnackbar({ open: true, message: "Pastikan data anda sudah sesuai atau Hubungi Admin!", severity: "error" });
+    showSnackbar({
+      message: "Pastikan data anda sudah sesuai atau Hubungi Admin!",
+      severity: "error",
+      anchorOrigin: { vertical: 'top', horizontal: 'center' },
+    });
     return;
   }
 
@@ -162,7 +177,10 @@ export default function LandingPage() {
     const resData = await response.json();
 
     if (response.ok) {
-      setSnackbar({ open: true, message: `Selamat datang, ${nama}!`, severity: "success" });
+      showSnackbar({
+        message: `Selamat datang, ${nama}!`,
+        anchorOrigin: { vertical: 'top', horizontal: 'center' },
+      });
 
       const userData = {
         id_user: resData.data.id_user,
@@ -178,10 +196,18 @@ export default function LandingPage() {
 
       setTimeout(() => navigate("/doorprize"), 1000);
     } else {
-      setSnackbar({ open: true, message: resData.error, severity: "error" });
+      showSnackbar({
+        message: resData.error,
+        severity: "error",
+        anchorOrigin: { vertical: 'top', horizontal: 'center' },
+      });
     }
       } catch {
-        setSnackbar({ open: true, message: "Terjadi kesalahan server!", severity: "error" });
+        showSnackbar({
+          message: "Terjadi kesalahan server!",
+          severity: "error",
+          anchorOrigin: { vertical: 'top', horizontal: 'center' },
+        });
       } finally {
         setIsLoadingSubmit(false);
       }
@@ -194,16 +220,14 @@ export default function LandingPage() {
     <div className={`relative w-full h-screen flex overflow-hidden smooth-transition max-md:flex-col ${isActive ? "bg-biru" : "bg-white"}`}>
       <img src={pindad} alt="Logo Pindad" className="absolute z-20 w-11 lg:w-20 top-6 left-4 lg:top-12 lg:left-9" />
       
-      <Snackbar 
-        open={snackbar.open} 
-        autoHideDuration={2000} 
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }} 
-      >
-        <Alert severity={snackbar.severity} variant="filled" sx={{ width: '100%', borderRadius: '50px' }}>
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
+      <AppSnackbar
+        open={snackbar.open}
+        message={snackbar.message}
+        severity={snackbar.severity}
+        anchorOrigin={snackbar.anchorOrigin}
+        duration={snackbar.duration}
+        onClose={closeSnackbar}
+      />
 
       <div className="center-flex relative flex-1 bg-transparent max-md:w-full max-md:h-[50%] max-md:p-9.5">
         <div className="text-left z-1">

@@ -1,5 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {useNavigate} from 'react-router-dom';
+import { BACKEND_URL } from '../../../config/socket';
+import AppSnackbar from '../../ui/AppSnackbar';
+import useSnackbar from '../../../hooks/useSnackbar';
+
 import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
 import LogoutIcon from '@mui/icons-material/Logout';
 import Tooltip from '@mui/material/Tooltip';
@@ -7,17 +11,14 @@ import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import pindad from "../../../assets/element/pindad.webp";
-import { BACKEND_URL } from '../../../config/socket';
 
 export default function DoorprizeHeader() {
   const [openQr, setOpenQr] = useState(false);
   const [openLogout, setOpenLogout] = useState(false);
   const [userName, setUserName] = useState("User");
-  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+  const { snackbar, showSnackbar, closeSnackbar } = useSnackbar();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -49,21 +50,14 @@ export default function DoorprizeHeader() {
 
       if (!response.ok) {
         throw new Error(resData.error || "Logout gagal");
-      }
+      } localStorage.removeItem("user");
+        localStorage.removeItem("hasRegistered");
+        localStorage.removeItem("id_user");
 
-      // Backend berhasil mengubah status menjadi "belum"
-      localStorage.removeItem("user");
-      localStorage.removeItem("hasRegistered");
-      localStorage.removeItem("id_user");
-
-      // Tutup dialog
       setOpenLogout(false);
 
-      // Tampilkan snackbar
-      setSnackbar({
-        open: true,
+      showSnackbar({
         message: "Logout Berhasil",
-        severity: "success",
       });
 
       // Pindah ke halaman awal
@@ -73,12 +67,9 @@ export default function DoorprizeHeader() {
 
     } catch (error) {
       console.error("Logout error:", error);
-
       setOpenLogout(false);
-
-      setSnackbar({
-        open: true,
-        message: error.message || "Logout gagal, silakan coba lagi",
+      showSnackbar({
+        message: error.message || "Logout gagal, silahkan coba lagi",
         severity: "error",
       });
     }
@@ -93,16 +84,16 @@ export default function DoorprizeHeader() {
 
   return (
     <header className="h-tgh flex items-center justify-between px-4 md:px-10">
-      <Snackbar 
-        open={snackbar.open} 
-        autoHideDuration={4000} 
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }} 
-      >
-        <Alert severity={snackbar.severity} variant="filled" sx={{ width: '100%', borderRadius: '50px' }}>
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
+
+      <AppSnackbar
+        open={snackbar.open}
+        message={snackbar.message}
+        severity={snackbar.severity}
+        anchorOrigin={snackbar.anchorOrigin}
+        duration={snackbar.duration}
+        onClose={closeSnackbar}
+      />  
+
       <div className="flex flex-1 justify-start">
         <img src={pindad} alt="Logo Pindad" className="object-contain h-8 md:h-12 lg:h-16" />
       </div>
