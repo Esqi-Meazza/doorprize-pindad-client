@@ -3,20 +3,19 @@ import {useNavigate} from 'react-router-dom';
 import { BACKEND_URL } from '../../../config/socket';
 import AppSnackbar from '../../ui/AppSnackbar';
 import useSnackbar from '../../../hooks/useSnackbar';
+import AppDialog from '../../ui/AppDialog';
+import ConfirmDialog from '../../common/ConfirmDialog';
+import useDialog from '../../../hooks/useDialog';
+import useConfirmDialog from '../../../hooks/useConfrimDialog';
 
 import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
 import LogoutIcon from '@mui/icons-material/Logout';
 import Tooltip from '@mui/material/Tooltip';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
-import Button from '@mui/material/Button';
 import pindad from "../../../assets/element/pindad.webp";
 
 export default function DoorprizeHeader() {
-  const [openQr, setOpenQr] = useState(false);
-  const [openLogout, setOpenLogout] = useState(false);
+  const { open: isQrOpen, openDialog: openQrDialog, closeDialog: closeQrDialog } = useDialog(false);
+  const { dialog, openConfirm, closeConfirm } = useConfirmDialog();
   const [userName, setUserName] = useState("User");
   const { snackbar, showSnackbar, closeSnackbar } = useSnackbar();
   const navigate = useNavigate();
@@ -54,7 +53,7 @@ export default function DoorprizeHeader() {
         localStorage.removeItem("hasRegistered");
         localStorage.removeItem("id_user");
 
-      setOpenLogout(false);
+      closeConfirm();
 
       showSnackbar({
         message: "Logout Berhasil",
@@ -67,12 +66,22 @@ export default function DoorprizeHeader() {
 
     } catch (error) {
       console.error("Logout error:", error);
-      setOpenLogout(false);
+      closeConfirm();
       showSnackbar({
         message: error.message || "Logout gagal, silahkan coba lagi",
         severity: "error",
       });
     }
+  };
+
+  const confirmLogout = () => {
+    openConfirm({
+      title: "KONFIRMASI",
+      message: "Apakah Anda Yakin Ingin Keluar?",
+      confirmText: "KELUAR",
+      cancelText: "KEMBALI",
+      onConfirm: handleLogout,
+    });
   };
 
   useEffect(() => {
@@ -106,7 +115,7 @@ export default function DoorprizeHeader() {
         {/* Menggunakan murni MUI IconButton agar efek ripple dan padding bawaan MUI bekerja sempurna */}
         <Tooltip title="Tampilkan QR Code" placement="bottom">
           <button 
-            onClick={() => setOpenQr(true)}
+            onClick={openQrDialog}
             className="bg-white hover:bg-white-500 text-olive p-2 md:p2 mr-2 md:mr-5 smooth-transition w-5 md:w-12 lg:w-18 rounded-buled center-flex"
           >
             <CardGiftcardIcon sx={{ 
@@ -120,7 +129,7 @@ export default function DoorprizeHeader() {
 
         <Tooltip title="Keluar / Logout" placement="bottom">
           <button 
-            onClick={() => setOpenLogout(true)}
+            onClick={confirmLogout}
             className="bg-kuning hover:bg-kuning-500 text-olive p-2 md:p2 smooth-transition w-5 md:w-12 lg:w-18 rounded-buled center-flex"
           >
             <LogoutIcon sx={{ 
@@ -133,52 +142,39 @@ export default function DoorprizeHeader() {
         </Tooltip>
       </div>
 
-      {/* DIALOG QR CODE */}
-      <Dialog open={openQr} onClose={() => setOpenQr(false)} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ fontWeight: 'bold', color: '#08415c', textAlign: 'center' }}>HUBUNGI PANITIA UNTUK SCAN QR CODE</DialogTitle>
-        <DialogContent sx={{ minHeight: '350px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderTop: '2px solid #f1c335' }}>
+      <AppDialog
+        open={isQrOpen}
+        onClose={closeQrDialog}
+        title="HUBUNGI PANITIA UNTUK SCAN QR CODE"
+        maxWidth="sm"
+        fullWidth
+      >
+        <div className="min-h-87.5 flex items-center justify-center border-t-2 border-kuning" style={{ borderTopColor: '#f1c335' }}>
           <div style={{ color: '#888', textAlign: 'center' }}>
             <CardGiftcardIcon sx={{ fontSize: 100, color: '#ccc', mb: 2 }} />
             <p>[ Area Gambar QR Code Akan Tampil Di Sini ]</p>
           </div>
-        </DialogContent>
-        <DialogActions sx={{ padding: '1.5rem', justifyContent: 'center' }}>
-          <Button onClick={() => setOpenQr(false)} variant="contained" sx={{ backgroundColor: '#f1c335', color: '#474b24', fontWeight: '900', borderRadius: '50px', padding: '10px 40px', '&:hover': { backgroundColor: '#d1a827' } }}>
+        </div>
+        <div className="flex justify-center p-6">
+          <button
+            type="button"
+            onClick={closeQrDialog}
+            className="bg-kuning hover:bg-yellow-500 text-olive font-black rounded-full py-2.5 px-10 smooth-transition"
+          >
             Kembali
-          </Button>
-        </DialogActions>
-      </Dialog>
+          </button>
+        </div>
+      </AppDialog>
 
-      {/* dialog logout */}
-      <Dialog open={openLogout} onClose={() => setOpenLogout(false)} maxWidth="sm" fullWidth>
-        <DialogContent sx={{ minHeight: '50px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderTop: '2px solid #f1c335' }}>
-          <div style={{ color: '#888', textAlign: 'center' }}>
-            <p className="text-2xl"> Apakah Anda Yakin Ingin Keluar? </p>
-          </div>
-        </DialogContent>
-        <DialogActions sx={{ padding: '1rem', justifyContent: 'center' }}>
-          <button 
-            onClick={() => setOpenLogout(false)}
-            className=" 
-              bg-kuning hover:bg-yellow-500 smooth-transition
-              text-olive font-black
-              rounded-pill
-              py-1 px-5.5 sm:mr-5
-            ">
-            KEMBALI
-          </button>
-          <button 
-            onClick={handleLogout} 
-            className="
-              bg-red-600 hover:bg-red-700 smooth-transition
-              text-white font-black
-              rounded-pill
-              py-1 px-5.5
-            ">
-            KELUAR
-          </button>
-        </DialogActions>
-      </Dialog>
+      <ConfirmDialog
+        open={dialog.open}
+        onClose={closeConfirm}
+        onConfirm={dialog.onConfirm || (() => {})}
+        title={dialog.title}
+        message={dialog.message}
+        confirmText={dialog.confirmText}
+        cancelText={dialog.cancelText}
+      />
     </header>
   );
 }

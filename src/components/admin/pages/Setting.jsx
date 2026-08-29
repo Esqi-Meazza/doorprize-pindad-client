@@ -1,8 +1,14 @@
 import { useState } from 'react';
 import { BACKEND_URL } from '../../../config/socket.js';
+import AppSnackbar from '../../ui/AppSnackbar';
+import useSnackbar from '../../../hooks/useSnackbar';
+import ConfirmDialog from '../../common/ConfirmDialog';
+import useConfirmDialog from '../../../hooks/useConfrimDialog';
 
 export default function SettingPage() {
-  const [loading, setLoading] = useState(false); 
+  const [loading, setLoading] = useState(false);
+  const { snackbar, showSnackbar, closeSnackbar } = useSnackbar();
+  const { dialog, openConfirm, closeConfirm } = useConfirmDialog();
   const token = localStorage.getItem("admin_token");
   
   const authHeader = {
@@ -11,11 +17,6 @@ export default function SettingPage() {
   };
 
   const handleReset = async () => {
-    // Konfirmasi ganda untuk mencegah salah klik
-    const confirmReset = window.confirm("PERINGATAN: Apakah Anda yakin ingin mereset seluruh event? Semua data pemenang akan dihapus!");
-    
-    if (!confirmReset) return;
-
     setLoading(true);
     try {
       const response = await fetch(`${BACKEND_URL}/api/admin/resetevent`, {
@@ -27,19 +28,58 @@ export default function SettingPage() {
 
       if (!response.ok) throw new Error(data.error || 'Gagal melakukan reset');
 
-      alert("Berhasil! Event telah di-reset dari nol.");
+      closeConfirm();
+      showSnackbar({
+        message: 'Berhasil! Event telah di-reset dari nol.',
+        severity: 'success',
+        anchorOrigin: { vertical: 'top', horizontal: 'center' },
+      });
     } catch (error) {
-      alert("Error: " + error.message);
+      closeConfirm();
+      showSnackbar({
+        message: 'Error: ' + error.message,
+        severity: 'error',
+        anchorOrigin: { vertical: 'top', horizontal: 'center' },
+      });
     } finally {
       setLoading(false);
     }
   };
 
+  const confirmReset = () => {
+    openConfirm({
+      title: 'PERINGATAN',
+      message: 'Apakah Anda yakin ingin mereset seluruh event? Semua data pemenang akan dihapus!',
+      confirmText: 'YA RESET',
+      cancelText: 'BATAL',
+      onConfirm: handleReset,
+    });
+  };
+
   return (
     <div className="h-full w-full center-flex flex-col flex-1">
+      <AppSnackbar
+        open={snackbar.open}
+        message={snackbar.message}
+        severity={snackbar.severity}
+        anchorOrigin={snackbar.anchorOrigin}
+        duration={snackbar.duration}
+        onClose={closeSnackbar}
+      />
+
+      <ConfirmDialog
+        open={dialog.open}
+        onClose={closeConfirm}
+        onConfirm={dialog.onConfirm || (() => {})}
+        title={dialog.title}
+        message={dialog.message}
+        confirmText={dialog.confirmText}
+        cancelText={dialog.cancelText}
+      />
+
       <h2 className="text-biru font-black mb-5 text-5xl">Reset Event?</h2>
       <button 
-        onClick={handleReset}
+        onClick={confirmReset}
         disabled={loading}
         className={`text-white text-2xl font-bold py-5 px-10 rounded-pill smooth-transition 
           ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-600 hover:bg-red-700 shadow-[0_10px_20px_rgba(220,38,38,0.3)]'}
