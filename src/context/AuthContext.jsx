@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 const AuthContext = createContext(null);
 
@@ -28,6 +28,28 @@ export function AuthProvider({ children }) {
     return () => window.removeEventListener("storage", handleStorage);
   }, []);
 
+  const loginAdmin = useCallback((token) => {
+    localStorage.setItem("admin_token", token);
+    setAdminToken(token);
+  }, []);
+
+  const logoutAdmin = useCallback(() => {
+    localStorage.removeItem("admin_token");
+    setAdminToken(null);
+  }, []);
+
+  const setUserSession = useCallback((nextUser) => {
+    localStorage.setItem("user", JSON.stringify(nextUser));
+    setUser(nextUser);
+  }, []);
+
+  const logoutUser = useCallback(() => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("hasRegistered");
+    localStorage.removeItem("id_user");
+    setUser(null);
+  }, []);
+
   const value = useMemo(() => ({
     adminToken,
     isAdminAuthenticated: Boolean(adminToken),
@@ -36,25 +58,11 @@ export function AuthProvider({ children }) {
     authHeaders: adminToken
       ? { Authorization: `Bearer ${adminToken}`, "Content-Type": "application/json" }
       : { "Content-Type": "application/json" },
-    loginAdmin: (token) => {
-      localStorage.setItem("admin_token", token);
-      setAdminToken(token);
-    },
-    logoutAdmin: () => {
-      localStorage.removeItem("admin_token");
-      setAdminToken(null);
-    },
-    setUserSession: (nextUser) => {
-      localStorage.setItem("user", JSON.stringify(nextUser));
-      setUser(nextUser);
-    },
-    logoutUser: () => {
-      localStorage.removeItem("user");
-      localStorage.removeItem("hasRegistered");
-      localStorage.removeItem("id_user");
-      setUser(null);
-    },
-  }), [adminToken, user]);
+    loginAdmin,
+    logoutAdmin,
+    setUserSession,
+    logoutUser,
+  }), [adminToken, user, loginAdmin, logoutAdmin, setUserSession, logoutUser]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
