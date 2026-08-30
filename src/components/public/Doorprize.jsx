@@ -8,7 +8,7 @@ import Button from '@mui/material/Button';
 import DoorprizeBackground from './features/Background.jsx';
 import DoorprizeHeader from './features/header.jsx';
 import StandbyStage from './features/Standbye.jsx';
-import Grid from '../Boxgrid.jsx'; 
+import Grid from '../common/Boxgrid.jsx'; 
 
 export default function DoorprizePage() {
   // 1. STATE UTAMA APLIKASI
