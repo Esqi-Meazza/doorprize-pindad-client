@@ -5,9 +5,9 @@ import AppSnackbar from '../ui/AppSnackbar.jsx';
 
 import CircularProgress from '@mui/material/CircularProgress';
 import Button from '@mui/material/Button';
-import DoorprizeBackground from './features/Background.jsx';
-import DoorprizeHeader from './features/header.jsx';
-import StandbyStage from './features/Standbye.jsx';
+import DoorprizeBackground from './display/Background.js';
+import DoorprizeHeader from './display/header.js';
+import StandbyStage from './display/Standbye.jsx';
 import Grid from '../common/Boxgrid.jsx'; 
 
 export default function DoorprizePage() {
