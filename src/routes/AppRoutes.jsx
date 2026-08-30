@@ -1,17 +1,18 @@
 import { Routes, Route } from "react-router-dom";
 // peserta
-import LandingPage from "../components/public/LandingPage.jsx";
-import DoorPrize from "../components/public/Doorprize.jsx";
+import LandingPage from "../pages/public/LandingPage.jsx";
+import DoorPrize from "../pages/public/Doorprize.js";
 // panitia
 import ProtectedRoute from "./ProtectedRoute.jsx";
-import Login from "../components/admin/Login.jsx";
 import AdminLayout from "../layouts/AdminLayout.jsx";
-import DashboardPage from "../components/admin/pages/Dashboard.jsx";
-import MainEventPage from "../components/admin/pages/MainEvent.jsx";
-import PesertaPage from "../components/admin/pages/Peserta.jsx";
-import HadiahPage from "../components/admin/pages/Hadiah.jsx"
-import SettingPage from "../components/admin/pages/Setting.jsx";
-import ProjectorDisplay from "../components/admin/pages/ProjectorDisplay.jsx";
+
+import Login from "../pages/admin/Login.jsx";
+import DashboardPage from "../pages/admin/pages/Dashboard.js";
+import MainEventPage from "../pages/admin/pages/MainEvent.js";
+import PesertaPage from "../pages/admin/pages/Peserta.js";
+import HadiahPage from "../pages/admin/pages/Hadiah.js"
+import SettingPage from "../pages/admin/pages/Setting.js";
+import ProjectorDisplay from "../pages/admin/pages/ProjectorDisplay.js";
 
 function AppRoutes() {
 	return (
