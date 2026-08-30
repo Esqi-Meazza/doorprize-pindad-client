@@ -73,7 +73,7 @@ export default function AdminLayout() {
             <span className="hidden lg:block">Peserta</span>
           </NavLink>
           
-          <NavLink to="/admin/doorprize" className="nav-item">
+          <NavLink to="/admin/hadiah" className="nav-item">
             <CardGiftcardIcon />
             <span className="hidden lg:block">Doorprize</span>
           </NavLink>

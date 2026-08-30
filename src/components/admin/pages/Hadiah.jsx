@@ -29,7 +29,7 @@ const theme = createTheme({
   },
 });
 
-export default function DoorprizePage() {
+export default function HadiahPage() {
   const [hadiah, setHadiah] = useState([]);
   const [loading, setLoading] = useState(true);
 
