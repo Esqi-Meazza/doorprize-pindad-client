@@ -5,7 +5,7 @@ import DoorPrize from "../components/public/Doorprize.jsx";
 // panitia
 import ProtectedRoute from "./ProtectedRoute.jsx";
 import Login from "../components/admin/Login.jsx";
-import AdminLayout from "../components/admin/DashboardAdmin.jsx";
+import AdminLayout from "../layouts/AdminLayout.jsx";
 import DashboardPage from "../components/admin/pages/Dashboard.jsx";
 import MainEventPage from "../components/admin/pages/MainEvent.jsx";
 import PesertaPage from "../components/admin/pages/Peserta.jsx";
