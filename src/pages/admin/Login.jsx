@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { BACKEND_URL } from '../../config/socket.js';
 import useSnackbar from "../../hooks/useSnackbar.js";
-import AppSnackbar from "../ui/AppSnackbar.jsx";
+import AppSnackbar from "../../components/ui/AppSnackbar.jsx";
 
 import PersonIcon from '@mui/icons-material/Person';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
