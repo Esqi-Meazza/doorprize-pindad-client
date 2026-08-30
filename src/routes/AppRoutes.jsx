@@ -2,8 +2,6 @@ import { Routes, Route } from "react-router-dom";
 // peserta
 import LandingPage from "../components/public/LandingPage.jsx";
 import DoorPrize from "../components/public/Doorprize.jsx";
-// universal
-import Grid from "../components/Boxgrid.jsx";
 // panitia
 import ProtectedRoute from "./ProtectedRoute.jsx";
 import Login from "../components/admin/Login.jsx";
@@ -21,7 +19,6 @@ function AppRoutes() {
 			{/* PESERTA */}
 			<Route path="/" element={<LandingPage />} />
 			<Route path="/doorprize" element={<DoorPrize />} />
-			<Route path="/grid" element={<Grid />} />
 
 			{/* PANITIA */}
 			<Route path="/admin" element={<Login />} />
