@@ -31,7 +31,7 @@ client/
 │   │   ├── EventContext.jsx
 │   │   └── SocketContext.jsx
 │   ├── hooks/
-│   │   ├── useConfrimDialog.js
+│   │   ├── useConfirmDialog.js
 │   │   ├── useDialog.js
 │   │   └── useSnackbar.js
 │   ├── layouts/
@@ -97,7 +97,7 @@ client/
 - `src/config/socket.js` — menentukan URL backend dan inisialisasi client socket.
 - `src/hooks/useSnackbar.js` — helper reusable untuk menampilkan notifikasi snackbar.
 - `src/hooks/useDialog.js` — hook untuk dialog interaktif yang sering dipakai di view admin.
-- `src/hooks/useConfrimDialog.js` — hook konfirmasi aksi seperti hapus peserta atau reset event.
+- `src/hooks/useConfirmmDialog.js` — hook konfirmasi aksi seperti hapus peserta atau reset event.
 
 ### Layer asset & styling
 - `src/assets/element/` — menyimpan font, logo, ilustrasi, dan audio yang dipakai pada UI.

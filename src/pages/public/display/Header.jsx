@@ -6,7 +6,7 @@ import useSnackbar from '../../../hooks/useSnackbar';
 import AppDialog from '../../ui/AppDialog';
 import ConfirmDialog from '../../common/ConfirmDialog';
 import useDialog from '../../../hooks/useDialog';
-import useConfirmDialog from '../../../hooks/useConfrimDialog';
+import useConfirmDialog from '../../../hooks/useConfirmDialog';
 
 import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
 import LogoutIcon from '@mui/icons-material/Logout';

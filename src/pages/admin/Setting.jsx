@@ -3,7 +3,7 @@ import { BACKEND_URL } from '../../../config/socket.js';
 import AppSnackbar from '../../ui/AppSnackbar';
 import useSnackbar from '../../../hooks/useSnackbar';
 import ConfirmDialog from '../../common/ConfirmDialog';
-import useConfirmDialog from '../../../hooks/useConfrimDialog';
+import useConfirmDialog from '../../hooks/useConfirmDialog.js';
 
 export default function SettingPage() {
   const [loading, setLoading] = useState(false);
