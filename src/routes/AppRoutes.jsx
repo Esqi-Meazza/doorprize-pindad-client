@@ -11,6 +11,7 @@ import DashboardPage from "../pages/admin/Dashboard.jsx";
 import MainEventPage from "../pages/admin/MainEvent.jsx";
 import ProjectorDisplay from "../pages/admin/ProjectorDisplay.jsx";
 import PesertaPage from "../pages/admin/Peserta.jsx";
+import PemenangPage from "../pages/admin/pemenang.jsx";
 import HadiahPage from "../pages/admin/Hadiah.jsx";
 import SettingPage from "../pages/admin/Setting.jsx";
 
@@ -29,6 +30,7 @@ function AppRoutes() {
 					<Route path="/admin/dashboard" element={<DashboardPage />} />
 					<Route path="/admin/main" element={<MainEventPage />} />
 					<Route path="/admin/peserta" element={<PesertaPage />} />
+					<Route path="/admin/pemenang" element={<PemenangPage />} />
 					<Route path="/admin/hadiah" element={<HadiahPage />} />
 					<Route path="/admin/setting" element={<SettingPage />} />
 					<Route path="/admin/projector" element={<ProjectorDisplay />} />

@@ -1,11 +1,13 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import DashboardIcon from "@mui/icons-material/Dashboard";
-import PeopleIcon from "@mui/icons-material/People";
-import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
-import LogoutIcon from "@mui/icons-material/Logout";
-import StarsIcon from '@mui/icons-material/Stars';
-import SettingsIcon from '@mui/icons-material/Settings';
 import LogoPindad from "../../assets/element/pindad.webp"; 
+
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import StarsIcon from '@mui/icons-material/Stars';
+import PeopleIcon from "@mui/icons-material/People";
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
+import SettingsIcon from '@mui/icons-material/Settings';
+import LogoutIcon from "@mui/icons-material/Logout";
 
 export default function AdminLayout() {
   const navigate = useNavigate();
@@ -71,6 +73,11 @@ export default function AdminLayout() {
           <NavLink to="/admin/peserta" className="nav-item">
             <PeopleIcon />
             <span className="hidden lg:block">Peserta</span>
+          </NavLink>
+
+          <NavLink to="/admin/pemenang" className="nav-item">
+            <EmojiEventsIcon />
+            <span className="hidden lg:block">Pemenang</span>
           </NavLink>
           
           <NavLink to="/admin/hadiah" className="nav-item">
