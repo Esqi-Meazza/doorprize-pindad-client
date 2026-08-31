@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import LogoPindad from "../assets/element/pindad.webp"; 
+import useConfirmDialog from "../hooks/useConfirmDialog";
+import ConfirmDialog from "../components/common/ConfirmDialog";
 
 // Icons
 import MenuIcon from '@mui/icons-material/Menu';
@@ -16,10 +18,21 @@ import LogoutIcon from "@mui/icons-material/Logout";
 export default function AdminLayout() {
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { dialog, openConfirm, closeConfirm } = useConfirmDialog();
 
   const handleLogout = () => {
     localStorage.removeItem("admin_token");
     navigate("/admin");
+  };
+
+    const confirmLogout = () => {
+    openConfirm({
+      title: "KONFIRMASI",
+      message: "Apakah Anda Yakin Ingin Keluar?",
+      confirmText: "YA, KELUAR",
+      cancelText: "BATAL",
+      onConfirm: handleLogout,
+    });
   };
 
   const handleMenuClick = () => {
@@ -100,7 +113,7 @@ export default function AdminLayout() {
         {/* LOGOUT BUTTON */}
         <div className="p-5 border-t-2 border-t-golden">
           <button 
-            onClick={handleLogout} 
+            onClick={confirmLogout} 
             className="
               w-full flex items-center justify-center gap-2 p-3
               bg-transparent text-white font-bold rounded-lg
@@ -113,6 +126,16 @@ export default function AdminLayout() {
           </button>
         </div>
       </aside>
+
+      <ConfirmDialog
+        open={dialog.open}
+        onClose={closeConfirm}
+        onConfirm={dialog.onConfirm || (() => {})}
+        title={dialog.title}
+        message={dialog.message}
+        confirmText={dialog.confirmText}
+        cancelText={dialog.cancelText}
+      />
 
       {/* KONTEN HALAMAN UTAMA */}
       <main className="flex-1 w-full h-full overflow-y-auto py-2 md:py-4 pl-9 md:pl-18 pr-4">

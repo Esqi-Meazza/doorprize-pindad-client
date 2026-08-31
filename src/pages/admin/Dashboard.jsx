@@ -115,19 +115,19 @@ export default function Dashboard() {
               title="Total Peserta"
               value={stats.totalPeserta}
               icon={<PeopleIcon fontSize="large" />}
-              colorClass="bg-blue-600"
+              colorClass="bg-biru"
             />
             <StatCard
               title="Total Hadiah"
               value={stats.totalHadiahTersedia}
               icon={<CardGiftcardIcon fontSize="large" />}
-              colorClass="bg-green-600"
+              colorClass="bg-golden"
             />
             <StatCard
               title="Hadiah Diundi"
               value={stats.hadiahTerundi}
               icon={<CheckCircleIcon fontSize="large" />}
-              colorClass="bg-purple-600"
+              colorClass="bg-biru"
             />
             <StatCard
               title="Total Pemenang Sah"
