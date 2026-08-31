@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 
 const defaultAnchorOrigin = {
     vertical: "bottom",
@@ -14,31 +14,37 @@ export default function useSnackbar() {
         duration: 2222,
     });
 
-    const showSnackbar = ({
-        message,
-        severity = "success",
-        anchorOrigin = defaultAnchorOrigin,
-        duration = 2222,
-    }) => {
-    setSnackbar({
-        open: true,
-        message,
-        severity,
-        anchorOrigin,
-        duration,
-        });
-    };
+    const showSnackbar = useCallback(
+        ({
+            message,
+            severity = "success",
+            anchorOrigin = defaultAnchorOrigin,
+            duration = 2222,
+        }) => {
+            setSnackbar({
+                open: true,
+                message,
+                severity,
+                anchorOrigin,
+                duration,
+            });
+        },
+        []
+    );
 
-    const closeSnackbar = () => {
+    const closeSnackbar = useCallback(() => {
         setSnackbar((prev) => ({
-        ...prev,
-        open: false,
+            ...prev,
+            open: false,
         }));
-    };
+    }, []);
 
-    return {
-        snackbar,
-        showSnackbar,
-        closeSnackbar,
-    };
+    return useMemo(
+        () => ({
+            snackbar,
+            showSnackbar,
+            closeSnackbar,
+        }),
+        [snackbar, showSnackbar, closeSnackbar]
+    );
 }

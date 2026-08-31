@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   ThemeProvider,
   createTheme,
@@ -12,420 +12,428 @@ import {
   TableHead,
   TableRow,
   Paper,
-  CircularProgress,
   Chip,
   IconButton,
-  Snackbar,
-  Alert,
+  TextField,
+  Select,
+  MenuItem,
+  InputAdornment,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
-import * as AlertDialog from "@radix-ui/react-alert-dialog";
-import { BACKEND_URL } from "../../config/socket";
 
-// Kustomisasi Tema Material UI
+// Icons
+import SearchIcon from "@mui/icons-material/Search";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import WarningAmberIcon from "@mui/icons-material/WarningAmber";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+
+// Config & Hooks (Sesuaikan Path)
+import { BACKEND_URL } from "../../config/socket";
+import useSnackbar from "../../hooks/useSnackbar";
+import AppSnackbar from "../../components/ui/AppSnackbar";
+import LoadingSkeleton from "../../components/ui/LoadingSkeleton";
+
 const theme = createTheme({
   palette: {
     primary: { main: "#08415c" }, // Biru
     secondary: { main: "#b39c4d" }, // Golden
     success: { main: "#157145" }, // Hijau
-    error: { main: "#d32f2f" }, // Merah default MUI
+    error: { main: "#d32f2f" },
   },
-  typography: {
-    fontFamily: "inherit",
-  },
+  typography: { fontFamily: "inherit" },
 });
 
-// Styling Inline untuk Radix Dialog agar rapi tanpa file CSS
-const radixOverlayStyle = {
-  backgroundColor: "rgba(0, 0, 0, 0.5)",
-  position: "fixed",
-  inset: 0,
-  zIndex: 1300,
-};
-const radixContentStyle = {
-  backgroundColor: "white",
-  borderRadius: "12px",
-  padding: "24px",
-  position: "fixed",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: "90vw",
-  maxWidth: "450px",
-  zIndex: 1400,
-  boxShadow: "0 10px 25px rgba(0,0,0,0.2)",
-};
-
 export default function PesertaPage() {
+  const { snackbar, showSnackbar, closeSnackbar } = useSnackbar();
+
+  // State Data & Pagination
   const [peserta, setPeserta] = useState([]);
+  const [divisiList, setDivisiList] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // State Filter & Navigasi
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  
+  const [searchInput, setSearchInput] = useState("");
+  const [activeSearch, setActiveSearch] = useState("");
+  const [selectedDivisi, setSelectedDivisi] = useState("");
 
-  // State untuk Feedback Snackbar
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success",
-  });
-
-  // State untuk Radix Alert Dialog Hapus 1 Peserta
+  // State Dialog Hapus
   const [deleteSingleOpen, setDeleteSingleOpen] = useState(false);
   const [selectedPeserta, setSelectedPeserta] = useState(null);
 
   const token = localStorage.getItem("admin_token");
-  const authHeader = {
-    Authorization: `Bearer ${token}`,
-    "Content-Type": "application/json",
-  };
 
-  // FETCH DATA PESERTA
-  const fetchPeserta = async () => {
+  // FETCH DATA DIVISI (Untuk Dropdown)
+  const fetchDivisi = useCallback(async () => {
+    try {
+      const authHeader = {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      };
+
+      const res = await fetch(`${BACKEND_URL}/api/admin/divisi`, { headers: authHeader });
+      const json = await res.json();
+      if (json.success) setDivisiList(json.data);
+    } catch (err) {
+      console.error("Gagal load divisi:", err);
+    }
+  }, [token]);
+
+  // FETCH DATA PESERTA (Paged)
+  const fetchPeserta = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${BACKEND_URL}/api/admin/peserta`, {
+      const authHeader = {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      };
+
+      const query = new URLSearchParams({
+        page,
+        limit,
+        search: activeSearch,
+        divisi: selectedDivisi,
+      }).toString();
+
+      const res = await fetch(`${BACKEND_URL}/api/admin/peserta-paged?${query}`, {
         headers: authHeader,
       });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        throw new Error(data.error || "Gagal memuat data peserta");
-      }
+      const json = await res.json();
 
-      setPeserta(
-        data.map((row) => ({
-          ...row,
-          id_user: row.id_user ?? row.id,
-        })),
-      );
+      if (json.success) {
+        setPeserta(json.data);
+        setTotalPages(json.pagination.totalPages);
+        setTotalItems(json.pagination.totalItems);
+      } else {
+        showSnackbar({ message: json.error, severity: "error" });
+      }
     } catch (err) {
-      console.error("Gagal ambil data peserta:", err);
-      showSnackbar("Gagal memuat data peserta", "error");
+      showSnackbar({ message: "Gagal memuat data peserta", severity: "error" });
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, limit, activeSearch, selectedDivisi, showSnackbar, token]);
+
+  // Eksekusi Fetch saat komponen mount atau state navigasi berubah
+  useEffect(() => {
+    fetchDivisi();
+  }, [fetchDivisi]);
 
   useEffect(() => {
     fetchPeserta();
-  }, []);
+  }, [fetchPeserta]);
 
-  const showSnackbar = (message, severity = "success") => {
-    setSnackbar({ open: true, message, severity });
+  // HANDLER FILTER
+  const handleSearch = (e) => {
+    if (e.key === "Enter" || e.type === "click") {
+      setActiveSearch(searchInput);
+      setPage(1); // Kembali ke halaman 1 tiap kali mencari
+    }
   };
 
-  // HANDLE HAPUS 1 PESERTA
-  const handleDeleteSingle = async () => {
-    const idUser = selectedPeserta?.id_user;
-    if (idUser === undefined || idUser === null) {
-      showSnackbar("ID peserta tidak ditemukan", "error");
-      setDeleteSingleOpen(false);
-      setSelectedPeserta(null);
-      return;
-    }
+  const handleResetFilter = () => {
+    setSearchInput("");
+    setActiveSearch("");
+    setSelectedDivisi("");
+    setPage(1);
+  };
 
+  // HANDLER DELETE SINGLE
+  const handleDeleteSingle = async () => {
+    if (!selectedPeserta?.id_user) return;
     try {
-      const res = await fetch(
-        `${BACKEND_URL}/api/admin/peserta/${encodeURIComponent(idUser)}`,
-        {
-          method: "DELETE",
-          headers: authHeader,
-        },
-      );
-      const data = await res.json().catch(() => ({}));
-      if (res.ok) {
-        setPeserta((currentPeserta) =>
-          currentPeserta.filter(
-            (row) => String(row.id_user) !== String(idUser),
-          ),
-        );
-        showSnackbar(
-          `Peserta ${selectedPeserta.nama_lengkap} berhasil dihapus`,
-        );
-        await fetchPeserta();
+      const authHeader = {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      };
+
+      const res = await fetch(`${BACKEND_URL}/api/admin/peserta/${selectedPeserta.id_user}`, {
+        method: "DELETE",
+        headers: authHeader,
+      });
+      const json = await res.json();
+
+      if (json.success) {
+        showSnackbar({ message: json.message, severity: "success" });
+        fetchPeserta();
       } else {
-        showSnackbar(data.error || "Gagal menghapus peserta", "error");
+        showSnackbar({ message: json.error, severity: "error" });
       }
-    } catch {
-      showSnackbar("Terjadi kesalahan server", "error");
+    } catch (err) {
+      showSnackbar({ message: "Terjadi kesalahan server", severity: "error" });
     } finally {
       setDeleteSingleOpen(false);
       setSelectedPeserta(null);
     }
   };
 
+  // Placeholder untuk Sub-Tahap Selanjutnya
+  const handleOpenAddModal = () => console.log("Buka Modal Tambah");
+  const handleOpenResetAllModal = () => console.log("Buka Modal Reset Semua");
+  const handleView = (row) => console.log("Lihat Detail:", row);
+  const handleEdit = (row) => console.log("Edit Peserta:", row);
+
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-        {/* HEADER & ACTION BUTTON */}
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            flexWrap: "wrap",
-            gap: 2,
-          }}
-        >
-          <Typography
-            variant="h4"
-            sx={{ color: "primary.main", fontWeight: 700 }}
-          >
-            Daftar Peserta
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 3, p: { xs: 2, md: 0 } }}>
+        
+        {/* 1. HEADER & ACTION BUTTONS */}
+        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 2 }}>
+          <Typography variant="h4" sx={{ color: "primary.main", fontWeight: 700 }}>
+            Data Peserta
           </Typography>
+          <Box sx={{ display: "flex", gap: 2 }}>
+            <Button
+              variant="outlined"
+              color="error"
+              startIcon={<WarningAmberIcon />}
+              onClick={handleOpenResetAllModal}
+              sx={{ fontWeight: "bold", borderRadius: "8px" }}
+            >
+              Hapus Semua
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<PersonAddIcon />}
+              onClick={handleOpenAddModal}
+              sx={{ fontWeight: "bold", borderRadius: "8px", boxShadow: "none" }}
+            >
+              Tambah Peserta
+            </Button>
+          </Box>
         </Box>
-        {/* TABEL DATA PESERTA */}
-        <TableContainer
-          component={Paper}
-          elevation={0}
-          sx={{
-            borderRadius: { xs: 1, sm: 2 },
-            border: "1px solid rgba(8,65,92,0.1)",
-            overflowX: { xs: "auto", sm: "visible" },
-          }}
-        >
-          <Table sx={{ minWidth: { xs: 500, sm: "auto" } }}>
-            <TableHead sx={{ bgcolor: "primary.main" }}>
-              <TableRow>
-                <TableCell
-                  sx={{
-                    color: "white",
-                    fontWeight: 600,
-                    width: { xs: "8%", sm: "5%" },
-                    fontSize: { xs: "0.75rem", sm: "0.875rem" },
-                    py: { xs: 1.5, sm: 2 },
-                  }}
-                >
-                  ID
-                </TableCell>
-                <TableCell
-                  sx={{
-                    color: "white",
-                    fontWeight: 600,
-                    width: { xs: "8%", sm: "5%" },
-                    fontSize: { xs: "0.75rem", sm: "0.875rem" },
-                    py: { xs: 1.5, sm: 2 },
-                  }}
-                >
-                  NIP
-                </TableCell>
-                <TableCell
-                  sx={{
-                    color: "white",
-                    fontWeight: 600,
-                    width: { xs: "30%", sm: "35%" },
-                    fontSize: { xs: "0.75rem", sm: "0.875rem" },
-                    py: { xs: 1.5, sm: 2 },
-                  }}
-                >
-                  Nama Lengkap
-                </TableCell>
-                <TableCell
-                  sx={{
-                    color: "white",
-                    fontWeight: 600,
-                    width: { xs: "25%", sm: "30%" },
-                    fontSize: { xs: "0.75rem", sm: "0.875rem" },
-                    py: { xs: 1.5, sm: 2 },
-                    display: { xs: "none", sm: "table-cell" },
-                  }}
-                >
-                  Divisi
-                </TableCell>
-                <TableCell
-                  sx={{
-                    color: "white",
-                    fontWeight: 600,
-                    width: { xs: "20%", sm: "15%" },
-                    fontSize: { xs: "0.75rem", sm: "0.875rem" },
-                    py: { xs: 1.5, sm: 2 },
-                  }}
-                >
-                  Status
-                </TableCell>
-                <TableCell
-                  sx={{
-                    color: "white",
-                    fontWeight: 600,
-                    width: { xs: "15%", sm: "15%" },
-                    textAlign: "center",
-                    fontSize: { xs: "0.75rem", sm: "0.875rem" },
-                    py: { xs: 1.5, sm: 2 },
-                  }}
-                >
-                  Aksi
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {loading ? (
+
+        {/* 2. FILTER BAR */}
+        <Paper elevation={0} sx={{ p: 2, borderRadius: 2, border: "1px solid rgba(8,65,92,0.1)", display: "flex", flexWrap: "wrap", gap: 2, alignItems: "center" }}>
+          {/* Input Search */}
+          <TextField
+            size="small"
+            placeholder="Cari NIP atau Nama..."
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onKeyDown={handleSearch}
+            sx={{ flex: { xs: "1 1 100%", md: "1 1 300px" }, "& .MuiOutlinedInput-root": { borderRadius: "8px" } }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon fontSize="small" sx={{ color: "text.secondary" }} />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <Button variant="contained" color="primary" onClick={handleSearch} sx={{ borderRadius: "8px" }}>
+            Cari
+          </Button>
+
+          {/* Select Divisi */}
+          <Select
+            size="small"
+            displayEmpty
+            value={selectedDivisi}
+            onChange={(e) => {
+              setSelectedDivisi(e.target.value);
+              setPage(1);
+            }}
+            sx={{ flex: { xs: "1 1 100%", md: "0 1 250px" }, borderRadius: "8px" }}
+          >
+            <MenuItem value=""><em>Semua Divisi</em></MenuItem>
+            {divisiList.map((div) => (
+              <MenuItem key={div.id_divisi} value={div.id_divisi}>{div.nama_divisi}</MenuItem>
+            ))}
+          </Select>
+
+          {/* Tombol Reset Filter */}
+          <Button
+            variant="text"
+            color="inherit"
+            startIcon={<RestartAltIcon />}
+            onClick={handleResetFilter}
+            sx={{ color: "text.secondary", fontWeight: 600 }}
+          >
+            Reset
+          </Button>
+        </Paper>
+
+        {/* 3. TABEL DATA PESERTA */}
+        <TableContainer component={Paper} elevation={0} sx={{ borderRadius: 2, border: "1px solid rgba(8,65,92,0.1)", minHeight: "400px" }}>
+          {loading ? (
+            <div className="p-4">
+              <LoadingSkeleton variant="table" count={5} />
+            </div>
+          ) : (
+            <Table sx={{ minWidth: 800 }}>
+              <TableHead sx={{ bgcolor: "primary.main" }}>
                 <TableRow>
-                  <TableCell
-                    colSpan={5}
-                    align="center"
-                    sx={{ py: { xs: 4, sm: 5 } }}
-                  >
-                    <CircularProgress color="primary" />
-                  </TableCell>
+                  <TableCell sx={{ color: "white", fontWeight: 600, width: "5%", py: 2, textAlign: "center" }}>NO</TableCell>
+                  <TableCell sx={{ color: "white", fontWeight: 600, width: "15%", py: 2 }}>NIP</TableCell>
+                  <TableCell sx={{ color: "white", fontWeight: 600, width: "25%", py: 2 }}>Nama Lengkap</TableCell>
+                  <TableCell sx={{ color: "white", fontWeight: 600, width: "20%", py: 2 }}>Divisi</TableCell>
+                  <TableCell sx={{ color: "white", fontWeight: 600, width: "15%", py: 2, textAlign: "center" }}>Status</TableCell>
+                  <TableCell sx={{ color: "white", fontWeight: 600, width: "20%", py: 2, textAlign: "center" }}>Aksi</TableCell>
                 </TableRow>
-              ) : peserta.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={5}
-                    align="center"
-                    sx={{ py: { xs: 4, sm: 6 } }}
-                  >
-                    <Typography
-                      variant="body1"
-                      sx={{ fontSize: { xs: "0.875rem", sm: "1rem" } }}
-                    >
-                      Belum ada peserta terdaftar.
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                peserta.map((row, index) => (
-                  <TableRow key={row.id_user} hover>
-                    <TableCell align="center"
-                      sx={{
-                        fontSize: { xs: "0.8rem", sm: "0.875rem" }, 
-                        py: { xs: 1, sm: 1.5 },
-                      }}
-                    >
-                      {row.id_user}
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        fontSize: { xs: "0.8rem", sm: "0.875rem" },
-                        py: { xs: 1, sm: 1.5 },
-                      }}
-                    >
-                      {row.nip}
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        fontWeight: 500,
-                        color: "primary.main",
-                        fontSize: { xs: "0.8rem", sm: "0.875rem" },
-                        py: { xs: 1, sm: 1.5 },
-                      }}
-                    >
-                      {row.nama_lengkap}
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        fontSize: { xs: "0.8rem", sm: "0.875rem" },
-                        py: { xs: 1, sm: 1.5 },
-                        display: { xs: "none", sm: "table-cell" },
-                      }}
-                    >
-                      {row.nama_divisi || "-"}
-                    </TableCell>
-                    <TableCell sx={{ py: { xs: 1, sm: 1.5 } }}>
-                      <Chip
-                        label={
-                          row.status_menang === "sudah"
-                            ? "Sudah Menang"
-                            : "Belum"
-                        }
-                        color={
-                          row.status_menang === "sudah" ? "success" : "default"
-                        }
-                        size="small"
-                        sx={{
-                          fontWeight: 600,
-                          fontSize: { xs: "0.7rem", sm: "0.75rem" },
-                          height: { xs: 24, sm: 32 },
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell align="center" sx={{ py: { xs: 1, sm: 1.5 } }}>
-                      <IconButton
-                        color="error"
-                        onClick={() => {
-                          setSelectedPeserta(row);
-                          setDeleteSingleOpen(true);
-                        }}
-                        sx={{
-                          padding: { xs: 0.5, sm: 1 },
-                          "& .MuiSvgIcon-root": {
-                            fontSize: { xs: "1.1rem", sm: "1.5rem" },
-                          },
-                        }}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
+              </TableHead>
+              <TableBody>
+                {peserta.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} align="center" sx={{ py: 8 }}>
+                      <Typography variant="body1" sx={{ color: "text.secondary" }}>
+                        Belum ada peserta yang ditemukan.
+                      </Typography>
                     </TableCell>
                   </TableRow>
-                ))
-              )} 
-            </TableBody>
-          </Table>
+                ) : (
+                  peserta.map((row, index) => (
+                    <TableRow key={row.id_user} hover>
+                      <TableCell align="center">{(page - 1) * limit + index + 1}</TableCell>
+                      <TableCell>{row.nip}</TableCell>
+                      <TableCell sx={{ fontWeight: 500, color: "primary.main" }}>{row.nama_lengkap}</TableCell>
+                      <TableCell>{row.nama_divisi || "-"}</TableCell>
+                      
+                      {/* KOLOM STATUS (OPSI C: CHIP + TEKS) */}
+                      <TableCell align="center">
+                        <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5, alignItems: "center" }}>
+                          <Chip 
+                            label={row.status_menang === "sudah" ? "Sudah Menang" : "Belum Menang"} 
+                            color={row.status_menang === "sudah" ? "success" : "default"} 
+                            size="small" 
+                            sx={{ fontSize: "0.7rem", fontWeight: "bold", height: 20 }} 
+                          />
+                          <Typography 
+                            variant="caption" 
+                            sx={{ 
+                              fontSize: "0.65rem", 
+                              fontWeight: 700, 
+                              color: row.status_terdaftar === "sudah" ? "primary.main" : "error.main" 
+                            }}
+                          >
+                            {row.status_terdaftar === "sudah" ? "Terdaftar" : "Belum Terdaftar"}
+                          </Typography>
+                        </Box>
+                      </TableCell>
+
+                      <TableCell align="center">
+                        <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
+                          <IconButton size="small" color="primary" onClick={() => handleView(row)} sx={{ bgcolor: "rgba(8,65,92,0.1)" }}>
+                            <VisibilityIcon fontSize="small" />
+                          </IconButton>
+                          <IconButton size="small" color="secondary" onClick={() => handleEdit(row)} sx={{ bgcolor: "rgba(179,156,77,0.1)" }}>
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                          <IconButton size="small" color="error" onClick={() => { setSelectedPeserta(row); setDeleteSingleOpen(true); }} sx={{ bgcolor: "rgba(211,47,47,0.1)" }}>
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          )}
         </TableContainer>
 
-        {/* RADIX ALERT DIALOG: HAPUS 1 PESERTA */}
-        <AlertDialog.Root
-          open={deleteSingleOpen}
-          onOpenChange={setDeleteSingleOpen}
-        >
-          <AlertDialog.Portal>
-            <AlertDialog.Overlay style={radixOverlayStyle} />
-            <AlertDialog.Content style={radixContentStyle}>
-              <AlertDialog.Title
-                style={{
-                  margin: 0,
-                  fontSize: "1.25rem",
-                  fontWeight: 700,
-                  color: "var(--color-biru)",
+        {/* 4. FOOTER PAGINATION */}
+        {!loading && totalItems > 0 && (
+          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 2, mt: 1, px: 1 }}>
+            
+            {/* Kiri: Limit Dropdown */}
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Typography variant="body2" color="text.secondary">Tampilkan:</Typography>
+              <Select
+                size="small"
+                value={limit}
+                onChange={(e) => {
+                  setLimit(e.target.value);
+                  setPage(1); // Kembali ke hal 1 saat limit diganti
                 }}
+                sx={{ borderRadius: "8px", height: "35px" }}
               >
-                Hapus Peserta
-              </AlertDialog.Title>
-              <AlertDialog.Description
-                style={{ margin: "16px 0", color: "#555", lineHeight: 1.5 }}
-              >
-                Ingin Dihapus saja peserta{" "}
-                <strong>{selectedPeserta?.nama_lengkap}</strong>?
-              </AlertDialog.Description>
-              <Box
-                sx={{
-                  display: "flex",
-                  gap: 2,
-                  justifyContent: "flex-end",
-                  mt: 3,
-                }}
-              >
-                <AlertDialog.Cancel asChild>
-                  <Button variant="outlined" color="inherit">
-                    Batal
-                  </Button>
-                </AlertDialog.Cancel>
-                <AlertDialog.Action asChild>
-                  <Button
-                    variant="contained"
-                    color="error"
-                    onClick={handleDeleteSingle}
-                  >
-                    Hapus
-                  </Button>
-                </AlertDialog.Action>
-              </Box>
-            </AlertDialog.Content>
-          </AlertDialog.Portal>
-        </AlertDialog.Root>
+                <MenuItem value={10}>10</MenuItem>
+                <MenuItem value={25}>25</MenuItem>
+                <MenuItem value={50}>50</MenuItem>
+              </Select>
+            </Box>
 
-        {/* MUI SNACKBAR UNTUK FEEDBACK SUKSES/ERROR */}
-        <Snackbar
-          open={snackbar.open}
-          autoHideDuration={2500}
-          onClose={() => setSnackbar({ ...snackbar, open: false })}
-          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+            {/* Tengah: Navigasi Angka & Panah */}
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+              <Button
+                variant="outlined"
+                size="small"
+                disabled={page === 1}
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                sx={{ minWidth: "40px", p: 1, borderRadius: "8px" }}
+              >
+                <ArrowBackIosNewIcon fontSize="small" />
+              </Button>
+              <Typography variant="body2" fontWeight="bold">
+                {page}
+              </Typography>
+              <Button
+                variant="outlined"
+                size="small"
+                disabled={page >= totalPages}
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                sx={{ minWidth: "40px", p: 1, borderRadius: "8px" }}
+              >
+                <ArrowForwardIosIcon fontSize="small" />
+              </Button>
+            </Box>
+
+            {/* Kanan: Info Total Halaman */}
+            <Typography variant="body2" color="text.secondary">
+              Halaman <strong>{page}</strong> dari <strong>{totalPages}</strong> (Total: {totalItems} data)
+            </Typography>
+          </Box>
+        )}
+
+        {/* 5. MUI DIALOG: KONFIRMASI HAPUS 1 PESERTA */}
+        <Dialog 
+          open={deleteSingleOpen} 
+          onClose={() => setDeleteSingleOpen(false)}
+          PaperProps={{ sx: { borderRadius: 3, p: 1, minWidth: { xs: '90vw', sm: '400px' } } }}
         >
-          <Alert
-            onClose={() => setSnackbar({ ...snackbar, open: false })}
-            severity={snackbar.severity}
-            sx={{ width: "100%", fontWeight: 500 }}
-          >
-            {snackbar.message}
-          </Alert>
-        </Snackbar>
+          <DialogTitle sx={{ fontWeight: 700, color: "primary.main" }}>
+            Hapus Peserta
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Apakah Anda yakin ingin menghapus peserta <strong>{selectedPeserta?.nama_lengkap}</strong>? Tindakan ini tidak dapat dibatalkan.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions sx={{ px: 3, pb: 2 }}>
+            <Button onClick={() => setDeleteSingleOpen(false)} color="inherit" variant="outlined" sx={{ borderRadius: 2 }}>
+              Batal
+            </Button>
+            <Button onClick={handleDeleteSingle} color="error" variant="contained" sx={{ borderRadius: 2, boxShadow: "none" }}>
+              Hapus
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* KOMPONEN SNACKBAR */}
+        <AppSnackbar
+          open={snackbar.open}
+          message={snackbar.message}
+          severity={snackbar.severity}
+          duration={snackbar.duration}
+          anchorOrigin={snackbar.anchorOrigin}
+          onClose={closeSnackbar}
+        />
+
       </Box>
     </ThemeProvider>
   );
