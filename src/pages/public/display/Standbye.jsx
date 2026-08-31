@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function StandbyStage() {
   return (
     <main className="grow center-flex p-8">

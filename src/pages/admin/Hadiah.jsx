@@ -14,7 +14,7 @@ import {
   CircularProgress,
   Chip,
 } from "@mui/material";
-import { BACKEND_URL } from "../../../config/socket.js";
+import { BACKEND_URL } from "../../config/socket.js";
 
 // Kustomisasi Tema Material UI (Konsisten dengan peserta.jsx)
 const theme = createTheme({

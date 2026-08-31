@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, Button, Chip } from '@mui/material';
 import PersonalVideoIcon from '@mui/icons-material/PersonalVideo';
 import SendIcon from '@mui/icons-material/Send';
 import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNew';
-import { socket, BACKEND_URL } from '../../../config/socket.js'; 
+import { socket, BACKEND_URL } from '../../config/socket.js';
 
 export default function MainEventPage() {
   const [sessions, setSessions] = useState([]);

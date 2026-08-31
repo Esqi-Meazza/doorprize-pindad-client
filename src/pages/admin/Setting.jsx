@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { BACKEND_URL } from '../../../config/socket.js';
-import AppSnackbar from '../../ui/AppSnackbar';
-import useSnackbar from '../../../hooks/useSnackbar';
-import ConfirmDialog from '../../common/ConfirmDialog';
+import { BACKEND_URL } from '../../config/socket.js';
+import AppSnackbar from '../../components/ui/AppSnackbar.jsx';
+import useSnackbar from '../../hooks/useSnackbar.js';
 import useConfirmDialog from '../../hooks/useConfirmDialog.js';
+import ConfirmDialog from '../../components/common/ConfirmDialog.jsx';
 
 export default function SettingPage() {
   const [loading, setLoading] = useState(false);

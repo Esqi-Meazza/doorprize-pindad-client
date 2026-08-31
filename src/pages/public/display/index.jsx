@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
-import { socket, BACKEND_URL } from '../../config/socket.js'; 
-import useSnackbar from '../../hooks/useSnackbar.js';
-import AppSnackbar from '../ui/AppSnackbar.jsx';
+import { socket, BACKEND_URL } from '../../../config/socket.js'; 
+import useSnackbar from '../../../hooks/useSnackbar.js';
+import AppSnackbar from '../../../components/ui/AppSnackbar.jsx';
 
 import CircularProgress from '@mui/material/CircularProgress';
 import Button from '@mui/material/Button';
-import DoorprizeBackground from './display/Background.js';
-import DoorprizeHeader from './display/header.js';
-import StandbyStage from './display/Standbye.jsx';
-import Grid from '../common/Boxgrid.jsx'; 
+import DoorprizeBackground from './Background.jsx';
+import DoorprizeHeader from './Header.jsx';
+import StandbyStage from './Standbye.jsx';
+import Grid from '../../../components/common/Boxgrid.jsx';
 
 export default function DoorprizePage() {
   // 1. STATE UTAMA APLIKASI

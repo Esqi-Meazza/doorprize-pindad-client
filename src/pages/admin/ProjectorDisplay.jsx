@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
-import DynamicSlotGrid from '../../common/Boxgrid'; 
-import soundUrl from '../../../assets/audio/Sound.mp3';
-import winSoundUrl from '../../../assets/audio/win.mp3';
+import Grid from '../../components/common/Boxgrid.jsx'; 
+import soundUrl from '../../assets/audio/Sound.mp3';
+import winSoundUrl from '../../assets/audio/win.mp3';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import StopIcon from '@mui/icons-material/Stop';
 import ReplayIcon from '@mui/icons-material/Replay';
 import SkipNextIcon from '@mui/icons-material/SkipNext';
-import { socket, BACKEND_URL } from '../../../config/socket'; 
+import { socket, BACKEND_URL } from '../../config/socket.js'; 
 
 export default function ProjectorDisplay() {
   const [appState, setAppState] = useState('STANDBY'); // STANDBY | SPINNING | RESULT
@@ -276,7 +276,7 @@ export default function ProjectorDisplay() {
 
           {(appState === 'SPINNING' || appState === 'RESULT') && (
             <div className="w-full h-full flex flex-col items-center justify-center">
-              <DynamicSlotGrid 
+              <Grid 
                 count={sessionData.jumlah_slot}
                 mode={sessionData.mode} 
                 isDesktop={true}                

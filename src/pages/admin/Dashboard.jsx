@@ -9,7 +9,7 @@ import {
   ListItemText,
   Box 
 } from "@mui/material";
-import { BACKEND_URL } from '../../../config/socket.js'; 
+import { BACKEND_URL } from '../../config/socket.js'; 
 
 export default function DashboardPage() {
   const [stats, setStats] = useState({ totalPeserta: 0, totalHadiahTersedia: 0, totalPemenang: 0 });

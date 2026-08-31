@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import {useNavigate} from 'react-router-dom';
 import { BACKEND_URL } from '../../../config/socket';
-import AppSnackbar from '../../ui/AppSnackbar';
+
+import AppSnackbar from '../../../components/ui/AppSnackbar';
 import useSnackbar from '../../../hooks/useSnackbar';
-import AppDialog from '../../ui/AppDialog';
-import ConfirmDialog from '../../common/ConfirmDialog';
-import useDialog from '../../../hooks/useDialog';
+import AppDialog from '../../../components/ui/AppDialog';
+import ConfirmDialog from '../../../components/common/ConfirmDialog';
 import useConfirmDialog from '../../../hooks/useConfirmDialog';
+import useDialog from '../../../hooks/useDialog';
 
 import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
 import LogoutIcon from '@mui/icons-material/Logout';

@@ -20,7 +20,7 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import * as AlertDialog from "@radix-ui/react-alert-dialog";
-import { BACKEND_URL } from "../../../config/socket.js";
+import { BACKEND_URL } from "../../config/socket";
 
 // Kustomisasi Tema Material UI
 const theme = createTheme({
