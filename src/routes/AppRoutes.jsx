@@ -25,6 +25,7 @@ function AppRoutes() {
 			{/* PANITIA */}
 			<Route path="/admin" element={<Login />} />
 			<Route element={<ProtectedRoute />}>
+				<Route path="/admin/projector" element={<ProjectorDisplay />} />
 				<Route element={<AdminLayout />}>
 					{/* HALAMAN PANITIA */}
 					<Route path="/admin/dashboard" element={<DashboardPage />} />
@@ -33,7 +34,6 @@ function AppRoutes() {
 					<Route path="/admin/pemenang" element={<PemenangPage />} />
 					<Route path="/admin/hadiah" element={<HadiahPage />} />
 					<Route path="/admin/setting" element={<SettingPage />} />
-					<Route path="/admin/projector" element={<ProjectorDisplay />} />
 				</Route>
 			</Route>
 		</Routes>

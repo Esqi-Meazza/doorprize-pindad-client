@@ -1,219 +1,229 @@
-import { useEffect, useState } from "react";
-import { 
-  Grid,
-  Card,
-  CardContent,
-  Typography,
-  List,
-  ListItem, 
-  ListItemText,
-  Box 
-} from "@mui/material";
-import { BACKEND_URL } from '../../config/socket.js'; 
+import { useEffect, useState, useCallback } from "react";
+import { BACKEND_URL } from "../../config/socket.js";
+import useLoading from "../../hooks/useLoading.js";
+import LoadingSkeleton from "../../components/ui/LoadingSkeleton.jsx";
+import AppSnackbar from "../../components/ui/AppSnackbar.jsx";
+import useSnackbar from "../../hooks/useSnackbar.js";
 
-export default function DashboardPage() {
-  const [stats, setStats] = useState({ totalPeserta: 0, totalHadiahTersedia: 0, totalPemenang: 0 });
-  const [winners, setWinners] = useState([]);
+// MUI Icons & Component
+import PeopleIcon from "@mui/icons-material/People";
+import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
+import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import PlayCircleFilledIcon from "@mui/icons-material/PlayCircleFilled";
+import CircularProgress from "@mui/material/CircularProgress";
+
+export default function Dashboard() {
+  const { isLoading, withLoading } = useLoading(true);
+  const { snackbar, showSnackbar, closeSnackbar } = useSnackbar();
   
-  const token = localStorage.getItem("admin_token");
-  const authHeader = {
-    "Authorization": `Bearer ${token}`,
-    "Content-Type": "application/json"
-  };
+  const [stats, setStats] = useState({
+    totalPeserta: 0,
+    totalPemenang: 0,
+    totalHadiahTersedia: 0,
+    hadiahTerundi: 0,
+    persentaseSelesai: 0,
+    sesiAktif: null,
+  });
+  const [winners, setWinners] = useState([]);
 
-  // 1. Fetch Statistik
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const res = await fetch(`${BACKEND_URL}/api/admin/stats`, { headers: authHeader });
-        if (res.ok) {
-          const data = await res.json();
-          setStats(data);
-        }
-      } catch (err) {
-        console.error("Gagal ambil stats:", err);
-      }
+  // Fungsi Fetch Paralel
+  const fetchDashboardData = useCallback(async () => {
+    const token = localStorage.getItem("admin_token");
+    const authHeader = {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
     };
-    fetchStats();
+
+    try {
+      const [statsRes, winnersRes] = await Promise.all([
+        fetch(`${BACKEND_URL}/api/admin/stats`, { headers: authHeader }),
+        fetch(`${BACKEND_URL}/api/admin/winners/latest`, { headers: authHeader }),
+      ]);
+
+      const statsJson = await statsRes.json();
+      const winnersJson = await winnersRes.json();
+
+      // Karena BE baru mereturn { success: true, data: ... }
+      if (statsJson.success) setStats(statsJson.data);
+      if (winnersJson.success) setWinners(winnersJson.data);
+    } catch (err) {
+      console.error("Gagal load data dashboard:", err);
+      showSnackbar({
+        message: "Gagal load data dashboard" || err,
+        severity: "error",
+        duration: 4000
+      })
+    }
   }, []);
 
-  // 2. Fetch Winner Logs (Short Polling)
+  // Inisialisasi awal dengan Skeleton Loading
   useEffect(() => {
-    const fetchWinners = async () => {
-      try {
-        const res = await fetch(`${BACKEND_URL}/api/admin/winners/latest`, { headers: authHeader });
-        if (res.ok) {
-          const data = await res.json();
-          setWinners(data);
-        }
-      } catch (err) {
-        console.error("Gagal ambil logs:", err);
-      }
-    };
+    withLoading(fetchDashboardData);
 
-    fetchWinners();
-    const intervalId = setInterval(fetchWinners, 4000);
+    // Sementara pakai interval (Short Polling) sampai Socket.io tahap lanjut siap
+    const intervalId = setInterval(fetchDashboardData, 5000);
     return () => clearInterval(intervalId);
-  }, []);
+  }, [withLoading, fetchDashboardData]);
+
+  // Komponen Reusable Card Kecil (Internal)
+  const StatCard = ({ title, value, icon, colorClass }) => (
+    <div className="bg-white p-5 lg:p-6 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow">
+      <div className={`p-4 rounded-lg ${colorClass} text-white shrink-0`}>
+        {icon}
+      </div>
+      <div className="flex flex-col">
+        <span className="text-sm font-semibold text-gray-500">{title}</span>
+        <span className="text-2xl lg:text-3xl font-bold text-gray-800 tracking-tight mt-1">
+          {value}
+        </span>
+      </div>
+    </div>
+  );
 
   return (
-    <Box sx={{ 
-      display: 'flex', 
-      flexDirection: 'column', 
-      gap: { xs: 3, md: 5 }, 
-      p: { xs: 2, sm: 3 } 
-    }}>
-      <Typography 
-        variant="h4" 
-        sx={{ 
-          color: 'var(--color-biru)', 
-          fontWeight: 700,
-          fontSize: { xs: '1.75rem', sm: '2rem', md: '2.125rem' }
+    <div className="w-full flex flex-col gap-6">
+      <AppSnackbar
+        open={snackbar.open}
+        message={snackbar.message}
+        severity={snackbar.severity}
+        anchorOrigin={snackbar.anchorOrigin}
+        duration={snackbar.duration}
+        onClose={closeSnackbar}
+        sx={{
+          width: 'auto'
         }}
-      >
-        Dashboard
-      </Typography>
+      />
+      {/* Header Dashboard */}
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold text-biru tracking-wide">
+          Dashboard
+        </h1>
+        <p className="text-gray-500 text-sm mt-1">
+          Ringkasan status doorprize realtime
+        </p>
+      </div>
 
-      {/* WIDGET STATISTIK */}
-      <Grid container spacing={{ xs: 2, md: 3 }}>
-        <Grid item xs={12} sm={4} md={4}>
-          <Card variant="outlined" sx={{ 
-            borderRadius: { xs: 2, md: 2 }, 
-            boxShadow: '0 4px 6px rgba(0,0,0,0.05)', 
-            borderColor: 'rgba(8,65,92,0.1)',
-            height: '100%'
-          }}>
-            <CardContent sx={{ p: { xs: 2, md: 3 } }}>
-              <Typography color="textSecondary" sx={{ 
-                fontWeight: 500,
-                fontSize: { xs: '0.875rem', md: '1rem' }
-              }}>
-                Total Peserta Terdaftar
-              </Typography>
-              <Typography variant="h3" sx={{ 
-                color: 'var(--color-golden)', 
-                fontWeight: 700, 
-                mt: 1,
-                fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' }
-              }}>
-                {stats.totalPeserta}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={4} md={4}>
-          <Card variant="outlined" sx={{ 
-            borderRadius: { xs: 2, md: 2 }, 
-            boxShadow: '0 4px 6px rgba(0,0,0,0.05)', 
-            borderColor: 'rgba(8,65,92,0.1)',
-            height: '100%'
-          }}>
-            <CardContent sx={{ p: { xs: 2, md: 3 } }}>
-              <Typography color="textSecondary" sx={{ 
-                fontWeight: 500,
-                fontSize: { xs: '0.875rem', md: '1rem' }
-              }}>
-                Total Hadiah Tersedia
-              </Typography>
-              <Typography variant="h3" sx={{ 
-                color: 'var(--color-golden)', 
-                fontWeight: 700, 
-                mt: 1,
-                fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' }
-              }}>
-                {stats.totalHadiahTersedia}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={4} md={4}>
-          <Card variant="outlined" sx={{ 
-            borderRadius: { xs: 2, md: 2 }, 
-            boxShadow: '0 4px 6px rgba(0,0,0,0.05)', 
-            borderColor: 'rgba(8,65,92,0.1)',
-            height: '100%'
-          }}>
-            <CardContent sx={{ p: { xs: 2, md: 3 } }}>
-              <Typography color="textSecondary" sx={{ 
-                fontWeight: 500,
-                fontSize: { xs: '0.875rem', md: '1rem' }
-              }}>
-                Total Pemenang Sah
-              </Typography>
-              <Typography variant="h3" sx={{ 
-                color: 'var(--color-golden)', 
-                fontWeight: 700, 
-                mt: 1,
-                fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' }
-              }}>
-                {stats.totalPemenang}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+      {isLoading ? (
+        // Tampilan saat pertama kali dimuat
+        <LoadingSkeleton variant="card" count={4} />
+      ) : (
+        <>
+          {/* GRID 1 - 4: Top Metrics */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+            <StatCard
+              title="Total Peserta"
+              value={stats.totalPeserta}
+              icon={<PeopleIcon fontSize="large" />}
+              colorClass="bg-blue-600"
+            />
+            <StatCard
+              title="Total Hadiah"
+              value={stats.totalHadiahTersedia}
+              icon={<CardGiftcardIcon fontSize="large" />}
+              colorClass="bg-green-600"
+            />
+            <StatCard
+              title="Hadiah Diundi"
+              value={stats.hadiahTerundi}
+              icon={<CheckCircleIcon fontSize="large" />}
+              colorClass="bg-purple-600"
+            />
+            <StatCard
+              title="Total Pemenang Sah"
+              value={stats.totalPemenang}
+              icon={<EmojiEventsIcon fontSize="large" />}
+              colorClass="bg-golden"
+            />
+          </div>
 
-      {/* KONTEN UTAMA */}
-      <Grid container spacing={{ xs: 2, md: 3 }}>
-        
-        {/* WINNER LOGS FEED - DIBUAT FULL WIDTH KARENA CONTROLLER DIHAPUS */}
-        <Grid item xs={12} md={12}>
-          <Card variant="outlined" sx={{ 
-            height: '100%', 
-            borderRadius: { xs: 2, md: 2 }, 
-            borderColor: 'rgba(8,65,92,0.1)' 
-          }}>
-            <CardContent sx={{ p: { xs: 2, md: 3 } }}>
-              <Typography variant="h6" sx={{ 
-                color: 'var(--color-biru)', 
-                fontWeight: 600, 
-                borderBottom: '2px solid rgba(179,156,77,0.2)', 
-                pb: 1, 
-                mb: 1,
-                fontSize: { xs: '1.1rem', md: '1.25rem' }
-              }}>
-                Live Winner Logs
-              </Typography>
-              
-              <List sx={{ 
-                maxHeight: { xs: 250, md: 400 }, 
-                overflowY: 'auto', 
-                p: 0 
-              }}>
-                {winners.length === 0 ? (
-                  <ListItem>
-                    <ListItemText primary="Belum ada pemenang..." />
-                  </ListItem>
-                ) : (
-                  winners.map((w, index) => (
-                    <ListItem key={index} sx={{ 
-                      bgcolor: '#f4f7f6', 
-                      borderLeft: '4px solid var(--color-hijau)', 
-                      mb: 1, 
-                      borderRadius: 1,
-                      p: { xs: 1, md: 2 }
-                    }}>
-                      <ListItemText 
-                        primary={w.nama_lengkap} 
-                        secondary={w.nama_hadiah}
-                        primaryTypographyProps={{ 
-                          fontWeight: 600, 
-                          color: 'var(--color-biru)',
-                          fontSize: { xs: '0.9rem', md: '1rem' }
-                        }}
-                        secondaryTypographyProps={{ 
-                          color: 'var(--color-oil)', 
-                          fontSize: { xs: '0.75rem', md: '0.85rem' }
-                        }}
-                      />
-                    </ListItem>
-                  ))
-                )}
-              </List>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
-    </Box>
+          {/* GRID 5: Sesi & Progress Acara */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* 5.1 Persentase Selesai */}
+            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex flex-col sm:flex-row items-center gap-6">
+              <div className="relative inline-flex shrink-0">
+                <CircularProgress
+                  variant="determinate"
+                  value={stats.persentaseSelesai}
+                  size={90}
+                  thickness={4}
+                  sx={{ color: "var(--color-biru)" }}
+                />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-xl font-bold text-gray-800">
+                    {stats.persentaseSelesai}%
+                  </span>
+                </div>
+              </div>
+              <div className="text-center sm:text-left">
+                <h3 className="text-lg font-bold text-gray-800">Progress Acara</h3>
+                <p className="text-sm text-gray-500 mt-1">
+                  <b>{stats.hadiahTerundi}</b> dari <b>{stats.totalHadiahTersedia}</b> total hadiah telah berhasil diundi.
+                </p>
+              </div>
+            </div>
+
+            {/* 5.2 Sesi Undian Aktif */}
+            <div className="bg-biru p-6 rounded-xl shadow-sm flex items-center justify-between text-white relative overflow-hidden">
+              {/* Efek Lingkaran Abstrak di Background */}
+              <div className="absolute top-[-20%] right-[-10%] w-32 h-32 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
+
+              <div className="z-10">
+                <h3 className="text-sm font-medium text-gray-300 uppercase tracking-wider">
+                  Sesi Aktif Saat Ini
+                </h3>
+                <p className="text-2xl font-bold text-golden mt-2">
+                  {stats.sesiAktif
+                    ? stats.sesiAktif.nama_sesi || stats.sesiAktif.nama_kelompok
+                    : "Tidak Ada Sesi Berjalan"}
+                </p>
+              </div>
+              <PlayCircleFilledIcon
+                sx={{ fontSize: 60, color: "var(--color-golden)" }}
+                className={stats.sesiAktif ? "animate-pulse" : "opacity-50"}
+              />
+            </div>
+          </div>
+
+          {/* GRID 6: Live Winner Logs */}
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden w-full">
+            <div className="bg-gray-50 p-5 border-b border-gray-200">
+              <h2 className="text-lg font-bold text-biru flex items-center gap-2">
+                <EmojiEventsIcon sx={{ color: "var(--color-golden)" }} />
+                Live Pemenang Terbaru
+              </h2>
+            </div>
+            <div className="p-4 sm:p-6 max-h-100 overflow-y-auto custom-scrollbar">
+              {winners.length === 0 ? (
+                <div className="text-center py-8 text-gray-500 font-medium">
+                  Belum ada data pemenang yang tercatat.
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {winners.map((w, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-4 bg-gray-50 p-4 rounded-lg border-l-4 border-hijau hover:shadow-md transition-shadow"
+                    >
+                      <div className="w-10 h-10 rounded-full bg-hijau/20 flex items-center justify-center font-bold text-hijau shrink-0">
+                        #{index + 1}
+                      </div>
+                      <div className="overflow-hidden">
+                        <p className="font-bold text-biru truncate">
+                          {w.nama_lengkap}
+                        </p>
+                        <p className="text-sm text-gray-500 truncate">
+                          Memenangkan: <span className="font-semibold text-golden">{w.nama_hadiah}</span>
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
   );
 }

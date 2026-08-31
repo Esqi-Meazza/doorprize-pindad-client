@@ -115,7 +115,7 @@ export default function AdminLayout() {
       </aside>
 
       {/* KONTEN HALAMAN UTAMA */}
-      <main className="flex-1 w-full h-full overflow-y-auto pt-5 px-5 pb-5 md:px-8">
+      <main className="flex-1 w-full h-full overflow-y-auto py-2 md:py-4 pl-9 md:pl-18 pr-4">
         <Outlet />
       </main>
       

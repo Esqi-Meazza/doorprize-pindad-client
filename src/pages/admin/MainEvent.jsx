@@ -7,13 +7,8 @@ import { socket, BACKEND_URL } from '../../config/socket.js';
 
 export default function MainEventPage() {
   const [sessions, setSessions] = useState([]);
-  
-  // Sesi yang diklik Admin untuk dilihat preview-nya di kanan
   const [selectedSession, setSelectedSession] = useState(null);
-  
-  // Sesi yang saat ini sedang TAYANG di proyektor (Live)
   const [liveSessionId, setLiveSessionId] = useState(null);
-  
   const [isProjectorActive, setIsProjectorActive] = useState(false);
 
   // 1. INIT DATA & SINKRONISASI BACKEND
@@ -32,27 +27,32 @@ export default function MainEventPage() {
       }));
       setSessions(dbSessions);
 
-      // B. Cek Panggung Saat Ini
+      // B. Cek Panggung dari Memori Socket (RAM)
       const resState = await fetch(`${BACKEND_URL}/api/spin/current`);
       const stateData = await resState.json();
       const { appState, sessionData } = stateData.data;
 
-      if (appState !== 'STANDBY' || sessionData) {
+      // C. Cari Sesi Active dari DB (sebagai pembanding utama)
+      const activeDbSession = dbSessions.find(s => s.status_sesi === 'active');
+
+      if (sessionData || activeDbSession) {
         setIsProjectorActive(true);
-        if (sessionData) {
-          setLiveSessionId(sessionData.id_kelompok);
-          const activeIndex = dbSessions.findIndex(s => s.id_kelompok === sessionData.id_kelompok);
-          if (activeIndex !== -1) {
-            setSelectedSession(dbSessions[activeIndex]);
-          }
+        // Prioritaskan sessionData RAM, jika kosong pakai dari DB
+        const targetSession = sessionData 
+          ? dbSessions.find(s => s.id_kelompok === sessionData.id_kelompok)
+          : activeDbSession;
+
+        if (targetSession) {
+          setLiveSessionId(targetSession.id_kelompok);
+          setSelectedSession(targetSession);
         }
       } else {
-        // Jika panggung kosong, pilih sesi pending pertama untuk preview
-        const firstPendingIndex = dbSessions.findIndex(s => s.status_sesi === 'pending');
-        if (firstPendingIndex !== -1) {
-          setSelectedSession(dbSessions[firstPendingIndex]);
+        // Jika benar-benar kosong di RAM & DB, pilih sesi pending pertama
+        const firstPending = dbSessions.find(s => s.status_sesi === 'pending');
+        if (firstPending) {
+          setSelectedSession(firstPending);
         } else if (dbSessions.length > 0) {
-          setSelectedSession(dbSessions[0]); 
+          setSelectedSession(dbSessions[0]);
         }
       }
     } catch (err) {
@@ -64,14 +64,12 @@ export default function MainEventPage() {
     fetchSessionsAndState();
   }, []);
 
-  // 2. SOCKET LISTENER (Menangkap Perubahan Panggung & Selesai Spin)
+  // 2. SOCKET LISTENER
   useEffect(() => {
-    // Menangkap jika proyektor pindah sesi (entah manual atau auto-next)
     socket.on('SESSION_CHANGED', (newSession) => {
       setLiveSessionId(newSession.id_kelompok);
       setIsProjectorActive(true); 
       
-      // Update selected session agar tampilan kanan ikut berubah mengikuti proyektor
       setSessions(prev => {
         const found = prev.find(s => s.id_kelompok === newSession.id_kelompok);
         if (found) setSelectedSession(found);
@@ -79,7 +77,6 @@ export default function MainEventPage() {
       });
     });
 
-    // JIKA SPIN BERHENTI (Result Keluar) -> Sesi Ini Resmi Selesai (Completed)
     socket.on('SPIN_RESULT', () => {
       setSessions(prev => prev.map(s => {
         if (s.id_kelompok === liveSessionId) {
@@ -89,7 +86,6 @@ export default function MainEventPage() {
       }));
     });
 
-    // SINKRONISASI JIKA ADA YANG MENEKAN CLEAR DARI TEMPAT LAIN
     socket.on('STAGE_CLEARED', () => {
       setIsProjectorActive(false);
       setLiveSessionId(null);
@@ -109,44 +105,42 @@ export default function MainEventPage() {
     };
   }, [liveSessionId]);
 
-  // 3. FUNGSI TOMBOL UTAMA (Buka Tab / Terapkan ke Panggung)
-  const handleAction = async () => {
-    if (!selectedSession) return;
-    
+  // 3. FUNGSI TOMBOL UTAMA
+const handleAction = async () => {
+  if (!selectedSession) return;
+  
+  try {
+    await fetch(`${BACKEND_URL}/api/spin/set-session`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id_kelompok: selectedSession.id_kelompok,
+        nama_kelompok: selectedSession.nama_kelompok,
+        jumlah_slot: selectedSession.target_jumlah_pemenang,
+        mode: selectedSession.tipe_event
+      })
+    });
+
+    setLiveSessionId(selectedSession.id_kelompok);
+
+    // 2. Jika proyektor belum terbuka, buka tab baru
     if (!isProjectorActive) {
-      // MODE A: Buka Tab Proyektor
       localStorage.setItem('active_projector_session', JSON.stringify(selectedSession));
       window.open('/admin/projector', '_blank');
       setIsProjectorActive(true); 
-      setLiveSessionId(selectedSession.id_kelompok);
-    } else {
-      // MODE B: Terapkan Sesi yang sedang diklik ke Proyektor
-      try {
-        await fetch(`${BACKEND_URL}/api/spin/set-session`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            id_kelompok: selectedSession.id_kelompok,
-            nama_kelompok: selectedSession.nama_kelompok,
-            jumlah_slot: selectedSession.target_jumlah_pemenang,
-            mode: selectedSession.tipe_event
-          })
-        });
-        setLiveSessionId(selectedSession.id_kelompok);
-      } catch (err) {
-        console.error("Gagal mengganti sesi:", err);
-      }
     }
-  };
+  } catch (err) {
+    console.error("Gagal mengaktifkan sesi ke panggung:", err);
+  }
+};
 
-  // 4. FUNGSI BARU: TUTUP PANGGUNG (KEMBALI)
+  // 4. TUTUP PANGGUNG
   const handleCloseProjector = async () => {
     const confirm = window.confirm("Yakin ingin menutup panggung? Proyektor akan kembali ke mode awal.");
     if (!confirm) return;
 
     try {
       await fetch(`${BACKEND_URL}/api/spin/clear`, { method: 'POST' });
-      // State isProjectorActive dan liveSessionId akan direset otomatis via socket 'STAGE_CLEARED'
     } catch (err) {
       console.error("Gagal menutup panggung:", err);
     }
@@ -185,7 +179,6 @@ export default function MainEventPage() {
                   <h3 className="font-bold text-gray-800">{sesi.nama_kelompok}</h3>
                   <p className="text-xs text-gray-500 mt-1">{sesi.target_jumlah_pemenang} Pemenang</p>
                   
-                  {/* PENANDA VISUAL "DI PANGGUNG" */}
                   {liveSessionId === sesi.id_kelompok && (
                     <div className="absolute top-0 right-0 bg-green-500 text-white text-[10px] font-black px-2 py-1 rounded-bl-lg">
                       DI PANGGUNG
@@ -219,7 +212,6 @@ export default function MainEventPage() {
                   Mengundi <span className="font-bold text-olive">{selectedSession.target_jumlah_pemenang}</span> Orang Pemenang
                 </p>
 
-                {/* WRAPPER TOMBOL AKSI */}
                 <div className="flex flex-col gap-3 items-center mt-4">
                   
                   <Button
@@ -248,7 +240,6 @@ export default function MainEventPage() {
                     }
                   </Button>
 
-                  {/* TOMBOL TUTUP PANGGUNG (HANYA MUNCUL JIKA AKTIF) */}
                   {isProjectorActive && (
                     <Button
                       variant="outlined"
