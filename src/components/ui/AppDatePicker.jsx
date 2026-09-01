@@ -106,6 +106,8 @@ export default function AppDatePicker({
             anchor="bottom"
             open={open}
             onClose={() => setOpen(false)}
+            sx={{ zIndex: 2000 }}
+            ModalProps={{ keepMounted: true }}
         >
             <Box p={3}>
             <Typography
