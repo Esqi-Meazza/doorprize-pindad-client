@@ -13,6 +13,7 @@ import ProjectorDisplay from "../pages/admin/ProjectorDisplay.jsx";
 import PesertaPage from "../pages/admin/Peserta.jsx";
 import PemenangPage from "../pages/admin/pemenang.jsx";
 import HadiahPage from "../pages/admin/Hadiah.jsx";
+import KelompokHadiahPage from "../pages/admin/KelompokHadiah.jsx";
 import SettingPage from "../pages/admin/Setting.jsx";
 
 function AppRoutes() {
@@ -33,6 +34,7 @@ function AppRoutes() {
 					<Route path="/admin/peserta" element={<PesertaPage />} />
 					<Route path="/admin/pemenang" element={<PemenangPage />} />
 					<Route path="/admin/hadiah" element={<HadiahPage />} />
+					<Route path="/admin/kelompok" element={<KelompokHadiahPage />} />
 					<Route path="/admin/setting" element={<SettingPage />} />
 				</Route>
 			</Route>

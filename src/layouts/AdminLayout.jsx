@@ -12,6 +12,7 @@ import StarsIcon from '@mui/icons-material/Stars';
 import PeopleIcon from "@mui/icons-material/People";
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
+import FolderIcon from '@mui/icons-material/Folder';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from "@mui/icons-material/Logout";
 
@@ -97,14 +98,18 @@ export default function AdminLayout() {
             <PeopleIcon /> <span>Peserta</span>
           </NavLink>
 
+          <NavLink to="/admin/pemenang" onClick={handleMenuClick} className="nav-item">
+            <EmojiEventsIcon /> <span>Pemenang</span>
+          </NavLink>
+
           <NavLink to="/admin/hadiah" onClick={handleMenuClick} className="nav-item">
             <CardGiftcardIcon /> <span>Doorprize</span>
           </NavLink>
 
-          <NavLink to="/admin/pemenang" onClick={handleMenuClick} className="nav-item">
-            <EmojiEventsIcon /> <span>Pemenang</span>
+          <NavLink to="/admin/kelompok" onClick={handleMenuClick} className="nav-item">
+            <FolderIcon /> <span>Kelompok Hadiah</span>
           </NavLink>
-          
+
           <NavLink to="/admin/setting" onClick={handleMenuClick} className="nav-item">
             <SettingsIcon /> <span>Setting</span>
           </NavLink>
