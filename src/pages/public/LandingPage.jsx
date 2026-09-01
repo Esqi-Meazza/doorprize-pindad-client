@@ -1,15 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { BACKEND_URL } from "../../config/socket.js";
-import Picker from "react-mobile-picker";
 import AppSnackbar from "../../components/ui/AppSnackbar.jsx";
 import useSnackbar from "../../hooks/useSnackbar.js";
 import AppInput from "../../components/ui/AppInput.jsx";
+import AppDatePicker from "../../components/ui/AppDatePicker.jsx";
 
-import Button from '@mui/material/Button';
-import Drawer from "@mui/material/Drawer";
-import Typography from "@mui/material/Typography";
-import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
@@ -244,69 +240,21 @@ export default function LandingPage() {
               />
             </div>
 
-            <div className="input-group relative flex items-center"> 
-              <button type="button" className="
-              btn-submit btn-date-picker rounded-pill w-full
-              flex items-center justify-self-start text-left relative
-              md:p-4 p-2.5 bg-white text-biru 
-              cursor-pointer active:scale-99 smooth-transition
-              " 
-              onClick={() => setOpen   (true)}>
-                <span className="text-biru text-sm md:text-md font-bold">
-                  Tanggal lahir : {value.day} {value.month} {value.year}
-                </span>
-                <CalendarMonthIcon fontSize="large" sx={{position: 'absolute', color: 'var(--color-olive)', right: 25, top: '50%', transform: 'translateY(-50%)', '@media (max-width: 768px)': {right: 16, fontSize: '1.5rem'},}}/>
-              </button>
-            </div>
+          <AppDatePicker
+            value={value}
+            onChange={(dateValue) => {
+              setValue({
+                day: dateValue.day,
+                month: dateValue.month,
+                year: dateValue.year,
+              });
 
-              <Drawer
-                anchor="bottom"
-                open={open}
-                onClose={() => setOpen(false)}
-              >
-                <Box p={3}>
-                  <Typography variant="h6" mb={2} sx={{ fontWeight: 'bold', color: 'var(--color-biru)', textAlign: 'center', paddingBottom: '10px', borderBottom: '1px solid var(--color-biru)' }}>
-                    TANGGAL LAHIR
-                  </Typography>
-                  <Picker value={value} onChange={setValue} wheelMode="normal">
-                    <Picker.Column name="day">
-                      {days.map((day) => (
-                        <Picker.Item key={day} value={day}>
-                          {day}
-                        </Picker.Item>
-                      ))}
-                    </Picker.Column>
-
-                    <Picker.Column name="month">
-                      {Object.keys(monthMap).map((month) => (
-                        <Picker.Item key={month} value={month}>
-                          {month}
-                        </Picker.Item>
-                      ))}
-                    </Picker.Column>
-
-                    <Picker.Column name="year">
-                      {years.map((year) => (
-                        <Picker.Item key={year} value={year}>
-                          {year}
-                        </Picker.Item>
-                      ))}
-                    </Picker.Column>
-                  </Picker>
-
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    sx={{ mt: 2, backgroundColor: 'var(--color-biru)', color: 'var(--color-white)', fontWeight: 'bold', padding: '16px', fontSize: '1rem'}}
-                    onClick={() => {
-                      setTgl_lahir(`${value.year}-${monthMap[value.month]}-${value.day}`);
-                      setOpen(false);
-                    }}
-                  >
-                    Simpan
-                  </Button>
-                </Box>
-              </Drawer>
+              setTgl_lahir(dateValue.date);
+            }}
+            label="Tanggal lahir"
+            title="TANGGAL LAHIR"
+            icon={<CalendarMonthIcon fontSize="large" />}
+          />
 
           <div className="input-group relative flex items-center justify-center">
             <AppInput
