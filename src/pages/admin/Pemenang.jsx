@@ -19,7 +19,6 @@ import {
 
 // Icons
 import DeleteIcon from "@mui/icons-material/Delete";
-import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 
 // Config & Hooks
 import { BACKEND_URL } from "../../config/socket";
@@ -170,8 +169,7 @@ export default function PemenangPage() {
             
             {/* HEADER */}
             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 2 }}>
-            <Typography variant="h4" sx={{ color: "primary.main", fontWeight: 700, display: 'flex', alignItems: 'center', gap: 1 }}>
-                <EmojiEventsIcon fontSize="large" sx={{ color: "secondary.main" }} />
+            <Typography variant="h4" sx={{ color: "primary.main", fontWeight: 700, display: 'flex', alignItems: 'center'}}>
                 Data Pemenang
             </Typography>
             </Box>
