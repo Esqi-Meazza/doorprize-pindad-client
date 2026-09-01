@@ -5,8 +5,8 @@ import AppSnackbar from "../../components/ui/AppSnackbar.jsx";
 import useSnackbar from "../../hooks/useSnackbar.js";
 import AppInput from "../../components/ui/AppInput.jsx";
 import AppDatePicker from "../../components/ui/AppDatePicker.jsx";
+import LoadingSpinner from "../../components/ui/LoadingSpinner.jsx";
 
-import CircularProgress from '@mui/material/CircularProgress';
 import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import PersonIcon from '@mui/icons-material/Person';
@@ -14,15 +14,6 @@ import Diversity3Icon from '@mui/icons-material/Diversity3';
 import pindad from "../../assets/element/pindad.webp";
 import orang from "../../assets/element/orang.webp";
 import "../../SlidingAnimation.css"; 
-
-const years = Array.from({ length: 100 }, (_, i) => `${2026 - i}`);
-const monthMap = {
-  Jan: "01", Feb: "02", Mar: "03", Apr: "04", Mei: "05", Jun: "06",
-  Jul: "07", Agu: "08", Sep: "09", Okt: "10", Nov: "11", Des: "12"
-};
-const days = Array.from({ length: 31 }, (_, i) =>
-  String(i + 1).padStart(2, "0")
-);
 
 export default function LandingPage() {
 
@@ -36,7 +27,6 @@ export default function LandingPage() {
     month: "Jan",
     year: "2000",
   });
-  const [open, setOpen] = useState(false);
 
   const [nip, setNip] = useState(() => {
     return sessionStorage.getItem("login_nip") || "";});
@@ -256,48 +246,66 @@ export default function LandingPage() {
             icon={<CalendarMonthIcon fontSize="large" />}
           />
 
-          <div className="input-group relative flex items-center justify-center">
-            <AppInput
-              type="text"
-              placeholder={isAutofillLoading ? "" : "Nama (Otomatis)"}
-              value={nama}
-              onChange={(e) => setNama(e.target.value)}
-              required
-              readOnly
-              icon={<PersonIcon fontSize="large" />}
-              startContent={
-                isAutofillLoading && (
-                  <div className="absolute left-3.75 top-1/2 -translate-y-1/2 flex items-center gap-2.5 text-gray-500 pointer-events-none">
-                    <CircularProgress size={20} color="inherit" />
-                    <span className="text-[14px]">Mencari data...</span>
-                  </div>
-                )
-              }
-            />
-          </div>
+            <div className="input-group relative flex items-center justify-center">
+              <AppInput
+                type="text"
+                placeholder={isAutofillLoading ? "" : "Nama (Otomatis)"}
+                value={nama}
+                onChange={(e) => setNama(e.target.value)}
+                required
+                readOnly
+                icon={<PersonIcon fontSize="large" />}
+                startContent={
+                  isAutofillLoading && (
+                    <LoadingSpinner
+                      inline
+                      direction="row"
+                      size={20}
+                      message="Mencari data..."
+                      className="absolute left-3.75 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
+                    />
+                  )
+                }
+              />
+            </div>
 
-          <div className="input-group relative flex items-center justify-center">
-            <AppInput
-              type="text"
-              placeholder={isAutofillLoading ? "" : "Divisi (Otomatis)"}
-              value={divisi}
-              onChange={(e) => setDivisi(e.target.value)}
-              required
-              readOnly
-              icon={<Diversity3Icon fontSize="large" />}
-              startContent={
-                isAutofillLoading && (
-                  <div className="absolute left-3.75 top-1/2 -translate-y-1/2 flex items-center gap-2.5 text-gray-500 pointer-events-none">
-                    <CircularProgress size={20} color="inherit" />
-                    <span className="text-[14px]">Mencari data...</span>
-                  </div>
-                )
-              }
-            />
-          </div>
+            <div className="input-group relative flex items-center justify-center">
+              <AppInput
+                type="text"
+                placeholder={isAutofillLoading ? "" : "Divisi (Otomatis)"}
+                value={divisi}
+                onChange={(e) => setDivisi(e.target.value)}
+                required
+                readOnly
+                icon={<Diversity3Icon fontSize="large" />}
+                startContent={
+                  isAutofillLoading && (
+                    <LoadingSpinner
+                      inline
+                      direction="row"
+                      size={20}
+                      message="Mencari data..."
+                      className="absolute left-3.75 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
+                    />
+                  )
+                }
+              />
+            </div>
 
-            <button type="submit" className="btn-submit bg-white text-biru cursor-pointer font-extrabold rounded-pill active:scale-95 md:text-xl md:mt-2.5 p-2.5 text-md mt-1.5 hover:border-golden border-4 border-white hover:border-4 smooth-transition" disabled={isLoadingSubmit}>
-              {isLoadingSubmit ? "MENYIMPAN DATA..." : "LOGIN SEKARANG"}
+            <button type="submit" className="btn-submit bg-white text-biru cursor-pointer font-extrabold rounded-pill active:scale-95 md:text-xl md:mt-2.5 p-2.5 text-md mt-1.5 hover:border-golden border-4 border-white hover:border-4 smooth-transition disabled:cursor-not-allowed disabled:opacity-80" disabled={isLoadingSubmit}>
+              {isLoadingSubmit ? (
+                <span className="flex items-center justify-center gap-2.5">
+                  <LoadingSpinner
+                    inline
+                    direction="row"
+                    size={20}
+                    className="text-biru"
+                  />
+                  <span className="whitespace-nowrap">MENYIMPAN DATA...</span>
+                </span>
+              ) : (
+                "LOGIN SEKARANG"
+              )}
             </button>
           </form>
 
