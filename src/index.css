@@ -51,35 +51,6 @@
 
 /* PANITIA */
 
-@utility input-focus {
-    display:flex;
-    align-items:center;
-    background-color:white;
-    height: clamp(45px, 8vh, 50px);
-    padding: 0 24px;
-    margin-bottom:20px;
-    border-radius:50px;
-    transition: box-shadow 0.3s ease;
-
-    @variant focus-within {
-        box-shadow: inset 0px 0px 20px -1px rgba(71, 75, 36, 0.50);
-    }
-}
-
-@utility login-input {
-    border: none;
-    background: transparent;
-    outline: none;
-    width: 100%;
-    font-size: clamp(14px, 2.5vw, 16px);
-    color: var(--color-olive);
-    
-    &::placeholder {
-        color: var(--color-olive);
-        font-weight: 800;
-    }
-}
-
 @utility nav-item {
     display: flex;
     align-items: center;

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { BACKEND_URL } from '../../config/socket.js';
 import useSnackbar from "../../hooks/useSnackbar.js";
 import AppSnackbar from "../../components/ui/AppSnackbar.jsx";
+import AppInput from "../../components/ui/AppInput.jsx";
 
 import PersonIcon from '@mui/icons-material/Person';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
@@ -116,50 +117,47 @@ export default function AdminLogin() {
         <form 
           onSubmit={handleLogin} 
           className="p-5">
-          
-          <div className="input-focus">
-            <input 
-              type="text" 
-              placeholder="username" 
-              value={username} 
-              onChange={(e) => setUsername(e.target.value)} 
-              required 
-              className="login-input"/>
-            <PersonIcon sx={{color:"olive"}} />
+          <div>
+            <AppInput
+              type="text"
+              placeholder="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              icon={<PersonIcon sx={{color:"olive"}} />}
+            />
           </div>
 
-          <div
-            className="input-focus">
-            <input 
-              type={showPassword ? "text" : "password"} 
-              placeholder="password" 
-              value={password} 
-              onChange={(e) => setPassword(e.target.value)} 
-              required 
-              className="login-input"
-            /> <button 
-                type="button" 
-                onClick={() => setShowPassword(!showPassword)}
-                className="
-                  icon-button
-                  center-flex
-                  bg-none
-                  border-none
-                  cursor-pointer
-                  shrink-0
-                  p-0
-                  ml-2.5
-                ">{showPassword ? 
-                  (<VisibilityIcon sx={{color:"olive"}} />) :
-                  (<VisibilityOffIcon sx={{color:"olive"}} />)}
-            </button>
+          <div className="relative my-5">
+            <AppInput
+              type={showPassword ? "text" : "password"}
+              placeholder="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="pr-12"
+              endContent={
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-6 top-1/2 -translate-y-1/2 bg-none border-none cursor-pointer p-0"
+                >
+                  {showPassword ? (
+                    <VisibilityIcon sx={{ color: "olive" }} />
+                  ) : (
+                    <VisibilityOffIcon sx={{ color: "olive" }} />
+                  )}
+                </button>
+              }
+            />
           </div>
 
+          <div className="input-group flex items-center justify-center">
           <button
             disabled={isLoading} 
             className="
               login-submit-btn 
-              w-full
+              w-80
               h-11 lg:h-12.5
               rounded-pill
               bg-white
@@ -175,6 +173,7 @@ export default function AdminLogin() {
             ">
             {isLoading ? "LOADING..." : "LOGIN"}
           </button>
+          </div>
           
         </form>
       </div>

@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import Picker from "react-mobile-picker";
 import { useNavigate } from "react-router-dom";
+import { BACKEND_URL } from "../../config/socket.js";
+import Picker from "react-mobile-picker";
 import AppSnackbar from "../../components/ui/AppSnackbar.jsx";
 import useSnackbar from "../../hooks/useSnackbar.js";
-import { BACKEND_URL } from "../../config/socket.js";
+import AppInput from "../../components/ui/AppInput.jsx";
 
 import Button from '@mui/material/Button';
 import Drawer from "@mui/material/Drawer";
@@ -17,27 +18,6 @@ import Diversity3Icon from '@mui/icons-material/Diversity3';
 import pindad from "../../assets/element/pindad.webp";
 import orang from "../../assets/element/orang.webp";
 import "../../SlidingAnimation.css"; 
-
-  const inputIconSx = {
-    position: 'absolute',
-    right: 25,
-    color: 'var(--color-olive)',
-    pointerEvents: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-
-    '@media (max-width: 768px)': {
-      fontSize: '1.5rem !important',
-      right: 15,
-    },
-  };
-
-  const inputBaseClass =
-  "w-full bg-white border-none rounded-pill pt-4 pb-4 pl-6 pr-16.5" +
-  "text-xl font-bold text-biru outline-none [font-family:inherit] box-border " +
-  "placeholder:text-biru " +
-  "max-md:py-2 max-md:px-4 max-md:text-sm";
 
 const years = Array.from({ length: 100 }, (_, i) => `${2026 - i}`);
 const monthMap = {
@@ -253,9 +233,15 @@ export default function LandingPage() {
           
           <form onSubmit={handleSubmit} className="flex flex-col gap-2 md:gap-5">
 
-            <div className="input-group relative flex items-center">
-              <input type="text" placeholder="NIP" value={nip} onChange={(e) => setNip(e.target.value)} className={inputBaseClass} required />
-              <BadgeOutlinedIcon sx={inputIconSx} fontSize="large"/>
+            <div className="input-group relative flex items-center justify-center">
+              <AppInput
+                type="text"
+                placeholder="NIP"
+                value={nip}
+                onChange={(e) => setNip(e.target.value)}
+                icon={<BadgeOutlinedIcon fontSize="large" />}
+                required
+              />
             </div>
 
             <div className="input-group relative flex items-center"> 
@@ -322,51 +308,44 @@ export default function LandingPage() {
                 </Box>
               </Drawer>
 
-            <div className="input-group relative flex items-center" style={{ position: 'relative' }}>
-            <input 
-              type="text" 
-              placeholder={isAutofillLoading ? "" : "Nama (Otomatis)"} 
+          <div className="input-group relative flex items-center justify-center">
+            <AppInput
+              type="text"
+              placeholder={isAutofillLoading ? "" : "Nama (Otomatis)"}
               value={nama}
+              onChange={(e) => setNama(e.target.value)}
               required
-              readOnly 
-              className={inputBaseClass}
+              readOnly
+              icon={<PersonIcon fontSize="large" />}
+              startContent={
+                isAutofillLoading && (
+                  <div className="absolute left-3.75 top-1/2 -translate-y-1/2 flex items-center gap-2.5 text-gray-500 pointer-events-none">
+                    <CircularProgress size={20} color="inherit" />
+                    <span className="text-[14px]">Mencari data...</span>
+                  </div>
+                )
+              }
             />
-            
-            {isAutofillLoading && (
-              <div style={{ 
-                position: 'absolute', left: '15px', top: '50%', transform: 'translateY(-50%)', 
-                display: 'flex', alignItems: 'center', gap: '10px', color: 'gray', pointerEvents: 'none' 
-              }}>
-                <CircularProgress size={20} color="inherit" />
-                <span style={{ fontSize: '14px' }}>Mencari data...</span>
-              </div>
-            )}
-
-            <PersonIcon sx={inputIconSx} fontSize="large"/>
           </div>
 
-                    <div className="input-group relative flex items-center">
-            <input 
-              type="text" 
-              placeholder={isAutofillLoading ? "" : "Divisi (Otomatis)"} 
+          <div className="input-group relative flex items-center justify-center">
+            <AppInput
+              type="text"
+              placeholder={isAutofillLoading ? "" : "Divisi (Otomatis)"}
               value={divisi}
+              onChange={(e) => setDivisi(e.target.value)}
               required
-              readOnly 
-              className={inputBaseClass}
+              readOnly
+              icon={<Diversity3Icon fontSize="large" />}
+              startContent={
+                isAutofillLoading && (
+                  <div className="absolute left-3.75 top-1/2 -translate-y-1/2 flex items-center gap-2.5 text-gray-500 pointer-events-none">
+                    <CircularProgress size={20} color="inherit" />
+                    <span className="text-[14px]">Mencari data...</span>
+                  </div>
+                )
+              }
             />
-            
-            {/* TRIK OVERLAY untuk Divisi */}
-            {isAutofillLoading && (
-              <div style={{ 
-                position: 'absolute', left: '15px', top: '50%', transform: 'translateY(-50%)', 
-                display: 'flex', alignItems: 'center', gap: '10px', color: 'gray', pointerEvents: 'none' 
-              }}>
-                <CircularProgress size={20} color="inherit" />
-                <span style={{ fontSize: '14px' }}>Mencari data...</span>
-              </div>
-            )}
-
-            <Diversity3Icon sx={inputIconSx} fontSize="large"/>
           </div>
 
             <button type="submit" className="btn-submit bg-white text-biru cursor-pointer font-extrabold rounded-pill active:scale-95 md:text-xl md:mt-2.5 p-2.5 text-md mt-1.5 hover:border-golden border-4 border-white hover:border-4 smooth-transition" disabled={isLoadingSubmit}>
