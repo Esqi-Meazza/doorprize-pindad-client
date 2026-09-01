@@ -4,6 +4,7 @@ import { BACKEND_URL } from '../../config/socket.js';
 import useSnackbar from "../../hooks/useSnackbar.js";
 import AppSnackbar from "../../components/ui/AppSnackbar.jsx";
 import AppInput from "../../components/ui/AppInput.jsx";
+import LoadingSpinner from "../../components/ui/LoadingSpinner.jsx";
 
 import PersonIcon from '@mui/icons-material/Person';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
@@ -171,7 +172,14 @@ export default function AdminLogin() {
               active:scale-95
               disabled:opacity-60 disabled:cursor-not-allowed
             ">
-            {isLoading ? "LOADING..." : "LOGIN"}
+            {isLoading ? (
+              <span className="flex items-center justify-center gap-2.5">
+                <LoadingSpinner inline direction="row" size={18} className="text-golden" />
+                <span>LOADING...</span>
+              </span>
+            ) : (
+              "LOGIN"
+            )}
           </button>
           </div>
           
