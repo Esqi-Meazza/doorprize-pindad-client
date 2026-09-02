@@ -1,20 +1,36 @@
 import { useState, useEffect } from 'react';
-import { Card, CardContent, Button, Chip } from '@mui/material';
-import PersonalVideoIcon from '@mui/icons-material/PersonalVideo';
-import SendIcon from '@mui/icons-material/Send';
-import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNew';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@mui/material';
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+
+// Config & Hooks
 import { socket, BACKEND_URL } from '../../config/socket.js';
+import useSnackbar from '../../hooks/useSnackbar.js';
+import useConfirmDialog from '../../hooks/useConfirmDialog.js';
+
+// Components
+import AppSnackbar from '../../components/ui/AppSnackbar.jsx';
+import ConfirmDialog from '../../components/common/ConfirmDialog.jsx';
+import LoadingSkeleton from '../../components/ui/LoadingSkeleton.jsx';
 
 export default function MainEventPage() {
+  const navigate = useNavigate();
+  
+  // Hooks UI
+  const { snackbar, showSnackbar, closeSnackbar } = useSnackbar();
+  const { dialog: confirmDialog, openConfirm, closeConfirm } = useConfirmDialog();
+
+  // State
   const [sessions, setSessions] = useState([]);
   const [selectedSession, setSelectedSession] = useState(null);
   const [liveSessionId, setLiveSessionId] = useState(null);
   const [isProjectorActive, setIsProjectorActive] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // 1. INIT DATA & SINKRONISASI BACKEND
   const fetchSessionsAndState = async () => {
+    setLoading(true);
     try {
-      // A. Ambil Data Sesi dari Database
       const resSessions = await fetch(`${BACKEND_URL}/api/spin/sessions`);
       const dataSessions = await resSessions.json();
       
@@ -27,17 +43,14 @@ export default function MainEventPage() {
       }));
       setSessions(dbSessions);
 
-      // B. Cek Panggung dari Memori Socket (RAM)
       const resState = await fetch(`${BACKEND_URL}/api/spin/current`);
       const stateData = await resState.json();
-      const { appState, sessionData } = stateData.data;
+      const { sessionData } = stateData.data;
 
-      // C. Cari Sesi Active dari DB (sebagai pembanding utama)
       const activeDbSession = dbSessions.find(s => s.status_sesi === 'active');
 
       if (sessionData || activeDbSession) {
         setIsProjectorActive(true);
-        // Prioritaskan sessionData RAM, jika kosong pakai dari DB
         const targetSession = sessionData 
           ? dbSessions.find(s => s.id_kelompok === sessionData.id_kelompok)
           : activeDbSession;
@@ -47,29 +60,25 @@ export default function MainEventPage() {
           setSelectedSession(targetSession);
         }
       } else {
-        // Jika benar-benar kosong di RAM & DB, pilih sesi pending pertama
         const firstPending = dbSessions.find(s => s.status_sesi === 'pending');
-        if (firstPending) {
-          setSelectedSession(firstPending);
-        } else if (dbSessions.length > 0) {
-          setSelectedSession(dbSessions[0]);
-        }
+        if (firstPending) setSelectedSession(firstPending);
+        else if (dbSessions.length > 0) setSelectedSession(dbSessions[0]);
       }
     } catch (err) {
       console.error("Gagal load data sesi real:", err);
+      showSnackbar({ message: "Gagal terhubung ke server", severity: "error" });
+    } finally {
+      setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchSessionsAndState();
-  }, []);
+  useEffect(() => { fetchSessionsAndState(); }, []);
 
   // 2. SOCKET LISTENER
   useEffect(() => {
     socket.on('SESSION_CHANGED', (newSession) => {
       setLiveSessionId(newSession.id_kelompok);
       setIsProjectorActive(true); 
-      
       setSessions(prev => {
         const found = prev.find(s => s.id_kelompok === newSession.id_kelompok);
         if (found) setSelectedSession(found);
@@ -79,9 +88,7 @@ export default function MainEventPage() {
 
     socket.on('SPIN_RESULT', () => {
       setSessions(prev => prev.map(s => {
-        if (s.id_kelompok === liveSessionId) {
-          return { ...s, status_sesi: 'completed' };
-        }
+        if (s.id_kelompok === liveSessionId) return { ...s, status_sesi: 'completed' };
         return s;
       }));
     });
@@ -92,7 +99,7 @@ export default function MainEventPage() {
     });
 
     socket.on('ALL_COMPLETED', () => {
-      alert("Seluruh Sesi Undian Telah Selesai!");
+      showSnackbar({ message: "Seluruh Sesi Undian Telah Selesai!", severity: "success" });
       setLiveSessionId(null);
       setSessions(prev => prev.map(s => ({ ...s, status_sesi: 'completed' })));
     });
@@ -103,177 +110,196 @@ export default function MainEventPage() {
       socket.off('STAGE_CLEARED');
       socket.off('ALL_COMPLETED');
     };
-  }, [liveSessionId]);
+  }, [liveSessionId, showSnackbar]);
 
-  // 3. FUNGSI TOMBOL UTAMA
-const handleAction = async () => {
-  if (!selectedSession) return;
-  
-  try {
-    await fetch(`${BACKEND_URL}/api/spin/set-session`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        id_kelompok: selectedSession.id_kelompok,
-        nama_kelompok: selectedSession.nama_kelompok,
-        jumlah_slot: selectedSession.target_jumlah_pemenang,
-        mode: selectedSession.tipe_event
-      })
-    });
-
-    setLiveSessionId(selectedSession.id_kelompok);
-
-    // 2. Jika proyektor belum terbuka, buka tab baru
-    if (!isProjectorActive) {
-      localStorage.setItem('active_projector_session', JSON.stringify(selectedSession));
-      window.open('/admin/projector', '_blank');
-      setIsProjectorActive(true); 
-    }
-  } catch (err) {
-    console.error("Gagal mengaktifkan sesi ke panggung:", err);
-  }
-};
-
-  // 4. TUTUP PANGGUNG
-  const handleCloseProjector = async () => {
-    const confirm = window.confirm("Yakin ingin menutup panggung? Proyektor akan kembali ke mode awal.");
-    if (!confirm) return;
-
+  // 3. FUNGSI TOMBOL UTAMA (Logika Aslimu Dikembalikan Sepenuhnya!)
+  const handleAction = async () => {
+    if (!selectedSession) return;
+    
     try {
-      await fetch(`${BACKEND_URL}/api/spin/clear`, { method: 'POST' });
+      await fetch(`${BACKEND_URL}/api/spin/set-session`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id_kelompok: selectedSession.id_kelompok,
+          nama_kelompok: selectedSession.nama_kelompok,
+          jumlah_slot: selectedSession.target_jumlah_pemenang,
+          mode: selectedSession.tipe_event
+        })
+      });
+
+      setLiveSessionId(selectedSession.id_kelompok);
+
+      // Jika proyektor belum terbuka, buka tab baru
+      if (!isProjectorActive) {
+        localStorage.setItem('active_projector_session', JSON.stringify(selectedSession));
+        window.open('/admin/projector', '_blank');
+        setIsProjectorActive(true);
+      }
     } catch (err) {
-      console.error("Gagal menutup panggung:", err);
+      console.error("Gagal mengaktifkan sesi ke panggung:", err);
+      showSnackbar({ message: "Gagal terhubung ke panggung", severity: "error" });
     }
   };
 
-  const getBadgeColor = (type) => {
-    if (type === 'super') return 'bg-golden text-white';
-    if (type === 'grand') return 'bg-kuning text-olive';
-    return 'bg-biru text-white';
+  // 4. TUTUP PANGGUNG
+  const handleCloseProjector = () => {
+    openConfirm({
+      title: "Tutup Panggung",
+      message: "Yakin ingin menutup panggung? Layar proyektor audiens akan kembali ke mode awal.",
+      confirmText: "Tutup Sekarang",
+      cancelText: "Batal",
+      onConfirm: async () => {
+        try {
+          await fetch(`${BACKEND_URL}/api/spin/clear`, { method: 'POST' });
+          closeConfirm();
+          showSnackbar({ message: "Panggung berhasil ditutup", severity: "success" });
+        } catch (err) {
+          showSnackbar({ message: "Gagal mematikan panggung", severity: "error" });
+        }
+      }
+    });
+  };
+
+  const COLOR_YELLOW = "#f1c335";
+  const COLOR_BLUE = "#08415c";
+
+  const getTipeColorClass = (tipe) => {
+    switch (tipe) {
+      case 'super':
+        return 'text-golden'; 
+      case 'grand':
+        return 'text-olive'; 
+      case 'reguler':
+        return 'text-[#157145]'; 
+      default:
+        return 'text-[#08415c]'; 
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 flex flex-col md:flex-row gap-6 font-sans">
+    <div className="min-h-screen bg-white relative flex flex-col items-center pt-8 pb-16 font-sans overflow-hidden">
       
-      {/* KIRI: LIST SESI */}
-      <div className="w-full md:w-1/3 flex flex-col h-[90vh]">
-        <div className="bg-biru text-white p-4 rounded-t-xl">
-          <h2 className="text-xl font-bold uppercase tracking-wider">Sesi Undian</h2>
+      {/* Navigasi Rahasia Pemenang */}
+      <div className="absolute top-4 right-8">
+        <Button 
+          variant="text" 
+          startIcon={<EmojiEventsIcon />} 
+          onClick={() => navigate('/admin/pemenang')}
+          sx={{ color: COLOR_BLUE, fontWeight: 'bold' }}
+        >
+          Riwayat Pemenang
+        </Button>
+      </div>
+
+      {/* HEADER TABS (Pixel Perfect Sesuai Gambar) */}
+      <div className="flex flex-wrap justify-center mb-6 z-10">
+        <div className="px-6 py-4 rounded-xl font-extrabold text-lg uppercase tracking-wide cursor-none" style={{ backgroundColor: COLOR_BLUE, color: "white" }}>
+          MAIN EVENT
         </div>
-        
-        <div className="bg-white border border-gray-200 rounded-b-xl flex-1 overflow-y-auto p-2 shadow-sm">
-          <div className="flex flex-col gap-2">
-            {sessions.map((sesi) => (
-              <button
-                key={sesi.id_kelompok}
-                onClick={() => setSelectedSession(sesi)}
-                disabled={sesi.status_sesi === 'completed'}
-                className={`
-                  text-left px-4 py-3 rounded-lg border transition-all flex justify-between items-center relative overflow-hidden
-                  ${selectedSession?.id_kelompok === sesi.id_kelompok ? 'border-golden bg-opacity ring-1 ring-golden' : 'border-gray-100 hover:bg-gray-50'}
-                  ${sesi.status_sesi === 'completed' ? 'opacity-50 cursor-not-allowed bg-gray-100' : ''}
-                  ${liveSessionId === sesi.id_kelompok ? 'bg-green-50 border-green-500 ring-1 ring-green-500' : ''}
-                `}
-              >
-                <div>
-                  <h3 className="font-bold text-gray-800">{sesi.nama_kelompok}</h3>
-                  <p className="text-xs text-gray-500 mt-1">{sesi.target_jumlah_pemenang} Pemenang</p>
-                  
-                  {liveSessionId === sesi.id_kelompok && (
-                    <div className="absolute top-0 right-0 bg-green-500 text-white text-[10px] font-black px-2 py-1 rounded-bl-lg">
-                      DI PANGGUNG
-                    </div>
-                  )}
-                </div>
-                
-                <span className={`text-xs px-2 py-1 rounded font-bold uppercase mt-2 ${getBadgeColor(sesi.tipe_event)}`}>
-                  {sesi.tipe_event}
-                </span>
-              </button>
-            ))}
+      </div>
+
+      {/* KOTAK UTAMA (Pixel Perfect Border Tebal) */}
+      <div 
+        className="relative w-full max-w-6xl px-5 py-8 shadow-2xl"
+        style={{ 
+          backgroundColor: COLOR_BLUE, 
+          borderRadius: '3.5rem', 
+          border: `24px solid ${COLOR_YELLOW}` 
+        }}
+      >
+        {loading ? (
+          <div className="flex flex-wrap justify-center gap-x-8 gap-y-6">
+            <LoadingSkeleton variant="rectangular" height={70} count={9} className="rounded-full w-[30%]" />
           </div>
-        </div>
-      </div>
-
-      {/* KANAN: PREVIEW & KONTROL UTAMA */}
-      <div className="w-full md:w-2/3 flex flex-col gap-6">
-        <Card className="shadow-md border-t-4 border-t-kuning rounded-xl transition-all duration-500">
-          <CardContent className="p-8 text-center flex flex-col items-center justify-center min-h-87.5">
-            {selectedSession ? (
-              <>
-                <Chip 
-                  label={selectedSession.tipe_event.toUpperCase() + ' DRAW'} 
-                  className={`mb-4 font-bold ${selectedSession.tipe_event === 'super' ? 'bg-golden text-white' : 'bg-kuning text-olive'}`} 
-                />
-                <h1 className="text-4xl md:text-5xl font-extrabold text-biru mb-2">
-                  {selectedSession.nama_kelompok}
-                </h1>
-                <p className="text-xl text-gray-600 mb-8 font-medium">
-                  Mengundi <span className="font-bold text-olive">{selectedSession.target_jumlah_pemenang}</span> Orang Pemenang
-                </p>
-
-                <div className="flex flex-col gap-3 items-center mt-4">
-                  
-                  <Button
-                    variant="contained"
-                    size="large"
-                    onClick={handleAction}
-                    disabled={selectedSession.status_sesi === 'completed' || liveSessionId === selectedSession.id_kelompok}
-                    startIcon={!isProjectorActive ? <PersonalVideoIcon fontSize="large" /> : <SendIcon fontSize="large" />}
-                    sx={{ 
-                      width: '320px',
-                      backgroundColor: !isProjectorActive ? 'var(--color-biru)' : '#10b981', 
-                      color: 'white',
-                      padding: '12px 24px', 
-                      fontSize: '1rem',
-                      fontWeight: 'bold',
-                      borderRadius: '50px',
-                      textTransform: 'none',
-                      boxShadow: '0 10px 20px var(--color-opacity)',
-                      '&:hover': { backgroundColor: !isProjectorActive ? 'var(--color-olive)' : '#059669' },
-                      '&:disabled': { backgroundColor: '#ccc' }
-                    }}
-                  >
-                    {!isProjectorActive 
-                      ? 'MENUJU LAYAR PROYEKTOR' 
-                      : (liveSessionId === selectedSession.id_kelompok ? 'SEDANG TAYANG' : 'TERAPKAN KE PANGGUNG')
-                    }
-                  </Button>
-
-                  {isProjectorActive && (
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      color="error"
-                      onClick={handleCloseProjector}
-                      startIcon={<PowerSettingsNewIcon />}
-                      sx={{ 
-                        width: '280px',
-                        borderRadius: '50px',
-                        fontWeight: 'bold',
-                        borderWidth: '2px',
-                        '&:hover': { borderWidth: '2px', backgroundColor: '#fee2e2' }
-                      }}
-                    >
-                      TUTUP PANGGUNG
-                    </Button>
-                  )}
-                  
-                </div>
-
-                {isProjectorActive && (
-                  <p className="text-sm text-green-600 font-bold mt-4 animate-pulse">
-                      Layar Proyektor Terhubung
-                  </p>
-                )}
-              </>
+        ) : (
+          /* UX Maksimal pada Grid Pill Buttons */
+          <div className="flex flex-wrap justify-center gap-x-10 gap-y-6 px-4">
+            {sessions.length === 0 ? (
+              <p className="text-white text-xl font-bold py-10 opacity-70">Belum ada sesi tersimpan.</p>
             ) : (
-              <p className="text-gray-400 text-lg">Memuat Sesi...</p>
+              sessions.map((sesi) => {
+                const isLive = liveSessionId === sesi.id_kelompok;
+                const isSelected = selectedSession?.id_kelompok === sesi.id_kelompok;
+                const isCompleted = sesi.status_sesi === 'completed';
+
+                return (
+                  <button
+                    key={sesi.id_kelompok}
+                    onClick={() => setSelectedSession(sesi)}
+                    disabled={isCompleted}
+                    className={`
+                      relative flex flex-col items-center justify-center w-[28%] min-w-60 py-2 px-6 rounded-4xl transition-all duration-200 overflow-hidden
+                      ${isCompleted ? 'bg-gray-300 text-gray-500 opacity-50 cursor-not-allowed shadow-inner' : `bg-white hover:scale-105 hover:shadow-[0_5px_15px_rgba(0,0,0,0.3)] ${getTipeColorClass(sesi.tipe_event)}`}
+                      ${isLive ? 'ring-6 ring-green-400 bg-green-50 shadow-[0_0_20px_rgba(74,222,128,0.6)] text-green-700!' : ''}
+                      ${isSelected && !isLive ? `ring-6 ring-kuning scale-105 z-10` : ''}
+                    `}
+                  >
+                    <span className="font-black text-sm md:text-md uppercase tracking-wide">{sesi.nama_kelompok}</span>
+                    <span className="text-sm font-semibold opacity-80">{sesi.target_jumlah_pemenang} Pemenang</span>
+                    
+                    {/* Badge Live UX */}
+                    {isLive && (
+                      <div className="absolute top-0 right-0 bg-green-500 text-white text-[10px] font-black px-3 py-1 rounded-bl-xl tracking-widest animate-pulse">
+                        LIVE
+                      </div>
+                    )}
+                  </button>
+                );
+              })
             )}
-          </CardContent>
-        </Card>
+          </div>
+        )}
       </div>
 
+      {/* TOMBOL KONTROL BAWAH (Logika Asli Dikembalikan) */}
+      <div className="mt-8 z-10 flex flex-wrap justify-center items-center gap-6">
+        
+        {/* Tombol Utama (Buka Proyektor / Terapkan / Sedang Tayang) */}
+        <button
+          onClick={handleAction}
+          disabled={!selectedSession || liveSessionId === selectedSession?.id_kelompok}
+          className="px-12 py-4 rounded-full font-black text-2xl md:text-3xl tracking-wider transition-transform hover:scale-105 active:scale-95 shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+          style={{ 
+            backgroundColor: (!isProjectorActive || liveSessionId === selectedSession?.id_kelompok) ? COLOR_YELLOW : '#10b981', 
+            color: (!isProjectorActive || liveSessionId === selectedSession?.id_kelompok) ? COLOR_BLUE : 'white' 
+          }}
+        >
+          {!isProjectorActive 
+            ? 'BUKA PROJEKTOR' 
+            : (liveSessionId === selectedSession?.id_kelompok ? 'SEDANG TAYANG' : 'TERAPKAN KE PANGGUNG')
+          }
+        </button>
+
+        {/* Tombol Tutup Panggung (Muncul disamping kalau proyektor nyala) */}
+        {isProjectorActive && (
+          <button
+            onClick={handleCloseProjector}
+            className="px-8 py-4 rounded-full font-black text-xl tracking-wider transition-transform hover:scale-105 active:scale-95 shadow-xl bg-red-600 hover:bg-red-700 text-white border-4 border-red-800"
+          >
+            TUTUP PANGGUNG
+          </button>
+        )}
+      </div>
+
+      {/* MODAL & SNACKBAR */}
+      <ConfirmDialog 
+        open={confirmDialog.open} 
+        onClose={closeConfirm} 
+        onConfirm={confirmDialog.onConfirm} 
+        title={confirmDialog.title} 
+        message={confirmDialog.message} 
+        confirmText={confirmDialog.confirmText} 
+        cancelText={confirmDialog.cancelText} 
+      />
+      <AppSnackbar 
+        open={snackbar.open} 
+        message={snackbar.message} 
+        severity={snackbar.severity} 
+        duration={snackbar.duration} 
+        anchorOrigin={snackbar.anchorOrigin} 
+        onClose={closeSnackbar} 
+      />
     </div>
   );
 }
