@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:reset": "node scripts/dev-reset.mjs",
+    "dev:r": "node scripts/dev-reset.mjs",
     "build": "vite build",
     "lint": "oxlint",
     "preview": "vite preview"
