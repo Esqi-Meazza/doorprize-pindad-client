@@ -51,6 +51,7 @@ const theme = createTheme({
 const DEFAULT_ADD_FORM = {
   nama_hadiah: "",
   tipe: "",
+  id_kelompok: "", // Ditambahkan
   stok_total: 1,
 };
 
@@ -64,6 +65,7 @@ export default function HadiahPage() {
 
   // State Data & Pagination
   const [hadiah, setHadiah] = useState([]);
+  const [kelompokList, setKelompokList] = useState([]); // State untuk Dropdown Kelompok
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -85,6 +87,19 @@ export default function HadiahPage() {
   const authHeader = { Authorization: `Bearer ${token}`, "Content-Type": "application/json" };
 
   // ================= FETCH DATA ================= //
+  
+  // Fetch Dropdown Kelompok
+  const fetchKelompok = useCallback(async () => {
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/admin/kelompok`, { headers: authHeader });
+      const json = await res.json();
+      if (json.success) setKelompokList(json.data);
+    } catch (err) {
+      console.error("Gagal load kelompok:", err);
+    }
+  }, [token]);
+
+  // Fetch Tabel Hadiah
   const fetchHadiah = useCallback(async () => {
     setLoading(true);
     try {
@@ -106,7 +121,10 @@ export default function HadiahPage() {
     }
   }, [page, limit, activeSearch, selectedTipe, showSnackbar, token]);
 
-  useEffect(() => { fetchHadiah(); }, [fetchHadiah]);
+  useEffect(() => { 
+    fetchKelompok();
+    fetchHadiah(); 
+  }, [fetchKelompok, fetchHadiah]);
 
   // ================= HANDLER FILTER ================= //
   const handleSearch = () => {
@@ -126,15 +144,20 @@ export default function HadiahPage() {
   // 1. TAMBAH HADIAH
   const handleSubmitAdd = async () => {
     if (!addForm.nama_hadiah || !addForm.tipe || !addForm.stok_total) {
-      showSnackbar({ message: "Semua field wajib diisi!", severity: "error" });
+      showSnackbar({ message: "Nama, Tipe, dan Stok wajib diisi!", severity: "error" });
       return;
     }
     setIsSubmitting(true);
     try {
+      const payload = {
+        ...addForm,
+        id_kelompok: addForm.id_kelompok === "" ? null : addForm.id_kelompok
+      };
+
       const res = await fetch(`${BACKEND_URL}/api/admin/hadiah`, {
         method: "POST",
         headers: authHeader,
-        body: JSON.stringify(addForm),
+        body: JSON.stringify(payload),
       });
       const json = await res.json();
       
@@ -159,7 +182,7 @@ export default function HadiahPage() {
 
   const handleSubmitEdit = async () => {
     if (!editForm.nama_hadiah || !editForm.tipe || editForm.stok_total === "") {
-      showSnackbar({ message: "Semua field wajib diisi!", severity: "error" });
+      showSnackbar({ message: "Nama, Tipe, dan Stok wajib diisi!", severity: "error" });
       return;
     }
     setIsSubmitting(true);
@@ -171,7 +194,7 @@ export default function HadiahPage() {
           nama_hadiah: editForm.nama_hadiah,
           tipe: editForm.tipe,
           stok_total: Number(editForm.stok_total),
-          id_kelompok: editForm.id_kelompok,
+          id_kelompok: editForm.id_kelompok === "" ? null : editForm.id_kelompok, // Handle empty state
         }),
       });
       const json = await res.json();
@@ -181,7 +204,7 @@ export default function HadiahPage() {
         editDialog.closeDialog();
         fetchHadiah();
       } else {
-        showSnackbar({ message: json.error, severity: "error" }); // Menangkap error stok dari BE
+        showSnackbar({ message: json.error, severity: "error" });
       }
     } catch (err) {
       showSnackbar({ message: "Terjadi kesalahan server", severity: "error" });
@@ -207,7 +230,7 @@ export default function HadiahPage() {
             showSnackbar({ message: json.message, severity: "success" });
             fetchHadiah();
           } else {
-            showSnackbar({ message: json.error, severity: "error" }); // Menangkap error foreign key
+            showSnackbar({ message: json.error, severity: "error" }); 
           }
         } catch (err) {
           showSnackbar({ message: "Terjadi kesalahan server", severity: "error" });
@@ -225,9 +248,9 @@ export default function HadiahPage() {
   // Helper Warna Tipe Hadiah
   const getTipeColor = (tipe) => {
     switch (tipe) {
-      case "super": return "secondary"; // Golden
-      case "grand": return "primary"; // Biru
-      case "reguler": return "success"; // Hijau
+      case "super": return "secondary"; 
+      case "grand": return "primary"; 
+      case "reguler": return "success"; 
       default: return "default";
     }
   };
@@ -274,20 +297,21 @@ export default function HadiahPage() {
           {loading ? (
             <div className="p-4"><LoadingSkeleton variant="table" count={5} /></div>
           ) : (
-            <Table sx={{ minWidth: 700 }}>
+            <Table sx={{ minWidth: 850 }}>
               <TableHead sx={{ bgcolor: "primary.main" }}>
                 <TableRow>
                   <TableCell sx={{ color: "white", fontWeight: 600, width: "5%", py: 2, textAlign: "center" }}>NO</TableCell>
-                  <TableCell sx={{ color: "white", fontWeight: 600, width: "35%", py: 2 }}>Nama Hadiah</TableCell>
-                  <TableCell sx={{ color: "white", fontWeight: 600, width: "20%", py: 2, textAlign: "center" }}>Tipe</TableCell>
-                  <TableCell sx={{ color: "white", fontWeight: 600, width: "20%", py: 2, textAlign: "center" }}>Sisa Stok</TableCell>
+                  <TableCell sx={{ color: "white", fontWeight: 600, width: "25%", py: 2 }}>Nama Hadiah</TableCell>
+                  <TableCell sx={{ color: "white", fontWeight: 600, width: "20%", py: 2 }}>Kelompok</TableCell>
+                  <TableCell sx={{ color: "white", fontWeight: 600, width: "15%", py: 2, textAlign: "center" }}>Tipe</TableCell>
+                  <TableCell sx={{ color: "white", fontWeight: 600, width: "15%", py: 2, textAlign: "center" }}>Sisa Stok</TableCell>
                   <TableCell sx={{ color: "white", fontWeight: 600, width: "20%", py: 2, textAlign: "center" }}>Aksi</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {hadiah.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} align="center" sx={{ py: 8 }}>
+                    <TableCell colSpan={6} align="center" sx={{ py: 8 }}>
                       <Typography variant="body1" sx={{ color: "text.secondary" }}>Belum ada data hadiah.</Typography>
                     </TableCell>
                   </TableRow>
@@ -296,6 +320,7 @@ export default function HadiahPage() {
                     <TableRow key={row.id_hadiah} hover onClick={() => handleView(row)} sx={{ cursor: "pointer" }}>
                       <TableCell align="center">{(page - 1) * limit + index + 1}</TableCell>
                       <TableCell sx={{ fontWeight: 700, color: "primary.main" }}>{row.nama_hadiah}</TableCell>
+                      <TableCell>{row.nama_kelompok || "-"}</TableCell>
                       <TableCell align="center">
                         <Chip label={row.tipe?.toUpperCase() || "-"} color={getTipeColor(row.tipe)} size="small" sx={{ fontWeight: "bold", fontSize: "0.7rem" }} />
                       </TableCell>
@@ -342,6 +367,9 @@ export default function HadiahPage() {
                 <Typography color="text.secondary" fontWeight={600}>Nama Hadiah</Typography>
                 <Typography fontWeight={800} color="primary.main" sx={{ fontSize: '1.1rem' }}>: {viewData.nama_hadiah}</Typography>
                 
+                <Typography color="text.secondary" fontWeight={600}>Kelompok</Typography>
+                <Typography fontWeight={700}>: {viewData.nama_kelompok || "-"}</Typography>
+
                 <Typography color="text.secondary" fontWeight={600}>Tipe Hadiah</Typography>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>: <Chip label={viewData.tipe?.toUpperCase()} color={getTipeColor(viewData.tipe)} size="small" sx={{ fontWeight: "bold" }} /></Box>
               </Box>
@@ -351,7 +379,7 @@ export default function HadiahPage() {
                   <Typography variant="caption" color="text.secondary" display="block" fontWeight={600}>Total Stok Awal</Typography>
                   <Typography variant="h6" fontWeight={800}>{viewData.stok_total}</Typography>
                 </Box>
-                <Box textAlign="center" flex={1} sx={{ borderLeft: "2px solid rgba(0,0,0,0.1)" }}>
+                <Box textAlign="center" flex={1} sx={{ borderLeft: "2px solid rgba(0,0,0,0.1)", paddingLeft: 2 }}>
                   <Typography variant="caption" color="text.secondary" display="block" fontWeight={600}>Stok Sisa</Typography>
                   <Typography variant="h6" fontWeight={800} color={viewData.stok_sisa === 0 ? "error.main" : "success.main"}>
                     {viewData.stok_sisa}
@@ -374,15 +402,28 @@ export default function HadiahPage() {
         >
           <Box component="form" sx={{ display: "flex", flexDirection: "column", gap: 3, pt: 1 }}>
             <Box><Typography variant="body2" fontWeight={600} mb={1} color="primary.main">Nama Hadiah</Typography><AppInput placeholder="Cth: Sepeda Listrik" value={addForm.nama_hadiah} onChange={(e) => setAddForm({ ...addForm, nama_hadiah: e.target.value })} /></Box>
-            <Box>
-              <Typography variant="body2" fontWeight={600} mb={1} color="primary.main">Tipe Hadiah</Typography>
-              <Select fullWidth displayEmpty value={addForm.tipe} onChange={(e) => setAddForm({ ...addForm, tipe: e.target.value })} sx={{ borderRadius: "50px", bgcolor: "white", "& .MuiSelect-select": { py: 1.5, px: 3, fontWeight: "bold", color: "var(--color-biru)" } }}>
-                <MenuItem value="" disabled>Pilih Tipe</MenuItem>
-                <MenuItem value="super">Super</MenuItem>
-                <MenuItem value="grand">Grand</MenuItem>
-                <MenuItem value="reguler">Reguler</MenuItem>
-              </Select>
+            
+            <Box sx={{ display: "flex", gap: 2 }}>
+              <Box flex={1}>
+                <Typography variant="body2" fontWeight={600} mb={1} color="primary.main">Tipe Hadiah</Typography>
+                <Select fullWidth displayEmpty value={addForm.tipe} onChange={(e) => setAddForm({ ...addForm, tipe: e.target.value })} sx={{ borderRadius: "50px", bgcolor: "white", "& .MuiSelect-select": { py: 1.5, px: 3, fontWeight: "bold", color: "var(--color-biru)" } }}>
+                  <MenuItem value="" disabled>Pilih Tipe</MenuItem>
+                  <MenuItem value="super">Super</MenuItem>
+                  <MenuItem value="grand">Grand</MenuItem>
+                  <MenuItem value="reguler">Reguler</MenuItem>
+                </Select>
+              </Box>
+              <Box flex={1}>
+                <Typography variant="body2" fontWeight={600} mb={1} color="primary.main">Kelompok</Typography>
+                <Select fullWidth displayEmpty value={addForm.id_kelompok} onChange={(e) => setAddForm({ ...addForm, id_kelompok: e.target.value })} sx={{ borderRadius: "50px", bgcolor: "white", "& .MuiSelect-select": { py: 1.5, px: 3, fontWeight: "bold", color: "var(--color-biru)" } }}>
+                  <MenuItem value="">Pilih (Opsional)</MenuItem>
+                  {kelompokList.map((k) => (
+                    <MenuItem key={k.id_kelompok} value={k.id_kelompok}>{k.nama_kelompok}</MenuItem>
+                  ))}
+                </Select>
+              </Box>
             </Box>
+
             <Box><Typography variant="body2" fontWeight={600} mb={1} color="primary.main">Stok Total</Typography><AppInput type="number" placeholder="0" value={addForm.stok_total} onChange={(e) => setAddForm({ ...addForm, stok_total: e.target.value })} inputProps={{ min: 1 }} /></Box>
           </Box>
         </AppDialog>
@@ -403,14 +444,27 @@ export default function HadiahPage() {
                 *Catatan: Menurunkan Stok Total tidak boleh lebih kecil dari jumlah yang sudah dimenangkan peserta.
               </Typography>
               <Box><Typography variant="body2" fontWeight={600} mb={1} color="primary.main">Nama Hadiah</Typography><AppInput placeholder="Nama Hadiah" value={editForm.nama_hadiah} onChange={(e) => setEditForm({ ...editForm, nama_hadiah: e.target.value })} /></Box>
-              <Box>
-                <Typography variant="body2" fontWeight={600} mb={1} color="primary.main">Tipe Hadiah</Typography>
-                <Select fullWidth value={editForm.tipe} onChange={(e) => setEditForm({ ...editForm, tipe: e.target.value })} sx={{ borderRadius: "50px", bgcolor: "white", "& .MuiSelect-select": { py: 1.5, px: 3, fontWeight: "bold", color: "var(--color-biru)" } }}>
-                  <MenuItem value="super">Super</MenuItem>
-                  <MenuItem value="grand">Grand</MenuItem>
-                  <MenuItem value="reguler">Reguler</MenuItem>
-                </Select>
+              
+              <Box sx={{ display: "flex", gap: 2 }}>
+                <Box flex={1}>
+                  <Typography variant="body2" fontWeight={600} mb={1} color="primary.main">Tipe Hadiah</Typography>
+                  <Select fullWidth value={editForm.tipe} onChange={(e) => setEditForm({ ...editForm, tipe: e.target.value })} sx={{ borderRadius: "50px", bgcolor: "white", "& .MuiSelect-select": { py: 1.5, px: 3, fontWeight: "bold", color: "var(--color-biru)" } }}>
+                    <MenuItem value="super">Super</MenuItem>
+                    <MenuItem value="grand">Grand</MenuItem>
+                    <MenuItem value="reguler">Reguler</MenuItem>
+                  </Select>
+                </Box>
+                <Box flex={1}>
+                  <Typography variant="body2" fontWeight={600} mb={1} color="primary.main">Kelompok</Typography>
+                  <Select fullWidth displayEmpty value={editForm.id_kelompok || ""} onChange={(e) => setEditForm({ ...editForm, id_kelompok: e.target.value })} sx={{ borderRadius: "50px", bgcolor: "white", "& .MuiSelect-select": { py: 1.5, px: 3, fontWeight: "bold", color: "var(--color-biru)" } }}>
+                    <MenuItem value="">Pilih (Opsional)</MenuItem>
+                    {kelompokList.map((k) => (
+                      <MenuItem key={k.id_kelompok} value={k.id_kelompok}>{k.nama_kelompok}</MenuItem>
+                    ))}
+                  </Select>
+                </Box>
               </Box>
+
               <Box><Typography variant="body2" fontWeight={600} mb={1} color="primary.main">Stok Total</Typography><AppInput type="number" value={editForm.stok_total} onChange={(e) => setEditForm({ ...editForm, stok_total: e.target.value })} inputProps={{ min: 1 }} /></Box>
             </Box>
           )}
