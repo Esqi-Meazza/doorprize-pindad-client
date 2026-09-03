@@ -1,13 +1,10 @@
 # Struktur Folder Client
 
+Dokumentasi ini disesuaikan dengan isi aktual folder `client/src`.
+
 ```text
 client/
-├── .gitignore
-├── .oxlintrc.json
-├── README.md
 ├── index.html
-├── package.json
-├── package-lock.json
 ├── vite.config.js
 ├── scripts/
 │   └── dev-reset.mjs
@@ -15,24 +12,38 @@ client/
 │   ├── App.jsx
 │   ├── main.jsx
 │   ├── index.css
+│   ├── SlidingAnimation.css
 │   ├── assets/
-│   │   └── element/
-│   │       ├── loginBackground.webp
-│   │       ├── orang.webp
-│   │       ├── pindad.webp
-│   │       ├── Satoshi-Variable.ttf
-│   │       ├── Sound.mp3
-│   │       └── win.mp3
-│   ├── api/
+│   │   ├── audio/
+│   │   │   ├── Sound.mp3
+│   │   │   └── win.mp3
+│   │   ├── element/
+│   │   │   ├── loginBackground.webp
+│   │   │   ├── orang.webp
+│   │   │   └── pindad.webp
+│   │   └── font/
+│   │       └── Satoshi-Variable.ttf
+│   ├── components/
+│   │   ├── common/
+│   │   │   ├── AppFilterBar.jsx
+│   │   │   ├── AppPagination.jsx
+│   │   │   ├── Boxgrid.jsx
+│   │   │   └── ConfirmDialog.jsx
+│   │   └── ui/
+│   │       ├── AppDatePicker.jsx
+│   │       ├── AppDialog.jsx
+│   │       ├── AppInput.jsx
+│   │       ├── AppSnackbar.jsx
+│   │       ├── LoadingSkeleton.jsx
+│   │       └── LoadingSpinner.jsx
 │   ├── config/
 │   │   └── socket.js
 │   ├── context/
-│   │   ├── AuthContext.jsx
-│   │   ├── EventContext.jsx
-│   │   └── SocketContext.jsx
+│   │   └── AuthContext.jsx
 │   ├── hooks/
 │   │   ├── useConfirmDialog.js
 │   │   ├── useDialog.js
+│   │   ├── useLoading.js
 │   │   └── useSnackbar.js
 │   ├── layouts/
 │   │   └── AdminLayout.jsx
@@ -40,8 +51,10 @@ client/
 │   │   ├── admin/
 │   │   │   ├── Dashboard.jsx
 │   │   │   ├── Hadiah.jsx
+│   │   │   ├── KelompokHadiah.jsx
 │   │   │   ├── Login.jsx
 │   │   │   ├── MainEvent.jsx
+│   │   │   ├── Pemenang.jsx
 │   │   │   ├── Peserta.jsx
 │   │   │   ├── ProjectorDisplay.jsx
 │   │   │   └── Setting.jsx
@@ -50,63 +63,61 @@ client/
 │   │       └── display/
 │   │           ├── Background.jsx
 │   │           ├── Header.jsx
-│   │           ├── Standby.jsx
+│   │           ├── Standbye.jsx
 │   │           └── index.jsx
-│   ├── routes/
-│   │   ├── AppRoutes.jsx
-│   │   └── ProtectedRoute.jsx
-│   ├── SlidingAnimation.css
-│   └── templates/
-│       └── (jika ada seiring pengembangan)
+│   └── routes/
+│       ├── AppRoutes.jsx
+│       └── ProtectedRoute.jsx
 └── dist/ (hasil build Vite, diabaikan dari dokumentasi utama)
 ```
 
 ## Penjelasan per layer
 
-### Layer entry & bootstrap
-- `src/App.jsx` — meng-wrap aplikasi dengan `BrowserRouter` dan memanggil router utama.
-- `src/main.jsx` — entry point React yang memasang `AuthProvider` dan meng-render aplikasi ke DOM.
-- `index.html` — shell HTML utama tempat aplikasi Vite mengisi root element.
-- `vite.config.js` — konfigurasi bundler Vite, proxy API, dan pengaturan server dev.
-- `package.json` — definisi script `dev`, `build`, lint, serta daftar dependency frontend.
-- `scripts/dev-reset.mjs` — helper Windows untuk menutup port 5173 dan menjalankan Vite ulang dengan bersih.
+### Layer entry dan bootstrap
+- `src/App.jsx` — membungkus aplikasi dengan `BrowserRouter` dan memanggil router utama.
+- `src/main.jsx` — entry point React yang memasang `StrictMode`, `AuthProvider`, dan merender aplikasi ke DOM.
+- `index.html` — shell HTML utama tempat Vite mengisi elemen root.
+- `vite.config.js` — konfigurasi bundler dan server Vite.
+- `scripts/dev-reset.mjs` — helper untuk mereset proses development Vite.
 
-### Layer routing & layout
-- `src/routes/AppRoutes.jsx` — men-definisikan semua route publik dan admin, termasuk guard proteksi.
-- `src/routes/ProtectedRoute.jsx` — memvalidasi token admin dan mengarahkan ke halaman login bila belum autentikasi.
-- `src/layouts/AdminLayout.jsx` — template shell dashboard admin dengan sidebar, navigasi, dan area konten dinamis.
+### Layer routing dan layout
+- `src/routes/AppRoutes.jsx` — mendefinisikan route publik, halaman login admin, halaman admin, dan halaman projector.
+- `src/routes/ProtectedRoute.jsx` — memvalidasi token JWT admin sebelum route terlindungi dapat diakses.
+- `src/layouts/AdminLayout.jsx` — shell dashboard admin yang menyediakan sidebar, navigasi, logout, dan `Outlet` untuk konten halaman.
 
 ### Layer pages / screen
-- `src/pages/public/LandingPage.jsx` — halaman cek-in peserta untuk mengisi NIP dan tanggal lahir.
-- `src/pages/public/display/index.jsx` — layar display undian publik yang menghubungkan socket dan status panggung.
-- `src/pages/public/display/Background.jsx` — komponen background SVG untuk tampilan undian.
-- `src/pages/public/display/Header.jsx` — header tampilan doorprize, identitas user, dan tombol logout.
-- `src/pages/public/display/Standby.jsx` — state menunggu sebelum pengundian dimulai.
-- `src/pages/admin/Login.jsx` — form login untuk admin panel.
-- `src/pages/admin/Dashboard.jsx` — statistik dashboard peserta, hadiah, dan pemenang terbaru.
-- `src/pages/admin/MainEvent.jsx` — pemilihan sesi undian dan kontrol operator proyektor.
-- `src/pages/admin/Peserta.jsx` — daftar peserta beserta aksi hapus data.
-- `src/pages/admin/Hadiah.jsx` — daftar hadiah/doorprize dan stok yang tersedia.
-- `src/pages/admin/ProjectorDisplay.jsx` — tampilan proyektor untuk acara live.
-- `src/pages/admin/Setting.jsx` — tombol reset event untuk mengembalikan data ke kondisi awal.
+- `src/pages/public/LandingPage.jsx` — halaman check-in peserta menggunakan NIP dan tanggal lahir.
+- `src/pages/public/display/index.jsx` — tampilan doorprize publik yang mengambil status panggung dan menerima event Socket.IO.
+- `src/pages/public/display/Background.jsx` — background SVG untuk layar doorprize.
+- `src/pages/public/display/Header.jsx` — header display publik, identitas peserta, QR dialog, dan logout.
+- `src/pages/public/display/Standbye.jsx` — tampilan standby sebelum pengundian dimulai.
+- `src/pages/admin/Login.jsx` — form autentikasi admin.
+- `src/pages/admin/Dashboard.jsx` — statistik peserta, hadiah, progres acara, dan pemenang terbaru.
+- `src/pages/admin/MainEvent.jsx` — pemilihan kelompok/sesi dan kontrol event undian.
+- `src/pages/admin/Peserta.jsx` — CRUD peserta, filter, dan pagination.
+- `src/pages/admin/Pemenang.jsx` — daftar pemenang, filter, detail, dan diskualifikasi pemenang.
+- `src/pages/admin/Hadiah.jsx` — CRUD hadiah, stok, kelompok hadiah, filter, dan pagination.
+- `src/pages/admin/KelompokHadiah.jsx` — CRUD kelompok atau sesi hadiah, status, urutan sesi, dan target pemenang.
+- `src/pages/admin/ProjectorDisplay.jsx` — tampilan projector untuk kontrol visual dan audio undian secara realtime.
+- `src/pages/admin/Setting.jsx` — pengaturan dan reset event.
 
-### Layer state & komunikasi
-- `src/context/AuthContext.jsx` — state global autentikasi admin/user dan helper login/logout.
-- `src/context/EventContext.jsx` — konteks event-side aplikasi yang kemungkinan dipakai untuk state penjadwalan atau event runtime.
-- `src/context/SocketContext.jsx` — koneksi Socket.IO yang dipusatkan untuk sinkronisasi realtime.
-- `src/config/socket.js` — menentukan URL backend dan inisialisasi client socket.
-- `src/hooks/useSnackbar.js` — helper reusable untuk menampilkan notifikasi snackbar.
-- `src/hooks/useDialog.js` — hook untuk dialog interaktif yang sering dipakai di view admin.
-- `src/hooks/useConfirmmDialog.js` — hook konfirmasi aksi seperti hapus peserta atau reset event.
+### Layer components reusable
+- `src/components/common/` — komponen umum lintas halaman seperti filter bar, pagination, grid kartu undian, dan dialog konfirmasi.
+- `src/components/ui/` — komponen UI dasar seperti input, date picker, dialog, snackbar, skeleton loading, dan spinner.
 
-### Layer asset & styling
-- `src/assets/element/` — menyimpan font, logo, ilustrasi, dan audio yang dipakai pada UI.
-- `src/index.css` — stylesheet global, token warna, font, dan utility Tailwind foundation.
-- `src/SlidingAnimation.css` — file styling khusus untuk animasi transisi panel atau efek sliding.
+### Layer state dan komunikasi
+- `src/context/AuthContext.jsx` — state autentikasi admin/peserta dan penyimpanan sesi pada `localStorage`.
+- `src/config/socket.js` — menentukan `BACKEND_URL` dan membuat instance Socket.IO client.
+- `src/hooks/useConfirmDialog.js` — state dan aksi untuk dialog konfirmasi.
+- `src/hooks/useDialog.js` — state buka/tutup dialog sederhana.
+- `src/hooks/useLoading.js` — state loading dan wrapper untuk fungsi asynchronous.
+- `src/hooks/useSnackbar.js` — state serta helper notifikasi snackbar.
 
-### Layer utility / placeholder
-- `src/api/` — folder persiapan untuk wrapper komunikasi API bila ingin dipisah dari halaman.
-- `src/templates/` — lokasi untuk template atau komponen reusable tambahan jika proyek berkembang.
-- `README.md` — dokumentasi setup dan informasi penggunaan frontend.
+### Layer asset dan styling
+- `src/assets/element/` — logo, gambar background login, dan gambar ilustrasi.
+- `src/assets/font/` — font `Satoshi` yang digunakan aplikasi.
+- `src/assets/audio/` — audio efek spin dan audio kemenangan.
+- `src/index.css` — import Tailwind, font, token tema, dan utility CSS global.
+- `src/SlidingAnimation.css` — styling animasi panel pada halaman landing page.
 
-> Catatan: folder `dist/` dibuat saat build produksi dan bukan bagian dari source utama, jadi disarankan tidak dimasukkan ke kontrol versi.
+> Catatan: folder `dist/` dibuat oleh `npm run build` sebagai output produksi. Folder ini bukan source utama dan sebaiknya tidak dimasukkan ke kontrol versi.
