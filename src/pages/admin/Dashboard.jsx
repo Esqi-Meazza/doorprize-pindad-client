@@ -4,6 +4,7 @@ import useLoading from "../../hooks/useLoading.js";
 import LoadingSkeleton from "../../components/ui/LoadingSkeleton.jsx";
 import AppSnackbar from "../../components/ui/AppSnackbar.jsx";
 import useSnackbar from "../../hooks/useSnackbar.js";
+import { useAuth } from "../../context/AuthContext.jsx";
 
 // MUI Icons & Component
 import PeopleIcon from "@mui/icons-material/People";
@@ -16,6 +17,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 export default function Dashboard() {
   const { isLoading, withLoading } = useLoading(true);
   const { snackbar, showSnackbar, closeSnackbar } = useSnackbar();
+  const { authHeaders } = useAuth();
   
   const [stats, setStats] = useState({
     totalPeserta: 0,
@@ -29,16 +31,10 @@ export default function Dashboard() {
 
   // Fungsi Fetch Paralel
   const fetchDashboardData = useCallback(async () => {
-    const token = localStorage.getItem("admin_token");
-    const authHeader = {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    };
-
     try {
       const [statsRes, winnersRes] = await Promise.all([
-        fetch(`${BACKEND_URL}/api/admin/stats`, { headers: authHeader }),
-        fetch(`${BACKEND_URL}/api/admin/winners/latest`, { headers: authHeader }),
+        fetch(`${BACKEND_URL}/api/admin/stats`, { headers: authHeaders }),
+        fetch(`${BACKEND_URL}/api/admin/winners/latest`, { headers: authHeaders }),
       ]);
 
       const statsJson = await statsRes.json();
@@ -55,7 +51,7 @@ export default function Dashboard() {
         duration: 4000
       })
     }
-  }, []);
+  }, [authHeaders, showSnackbar]);
 
   // Inisialisasi awal dengan Skeleton Loading
   useEffect(() => {

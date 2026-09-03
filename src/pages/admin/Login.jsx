@@ -5,6 +5,7 @@ import useSnackbar from "../../hooks/useSnackbar.js";
 import AppSnackbar from "../../components/ui/AppSnackbar.jsx";
 import AppInput from "../../components/ui/AppInput.jsx";
 import LoadingSpinner from "../../components/ui/LoadingSpinner.jsx";
+import { useAuth } from "../../context/AuthContext.jsx";
 
 import PersonIcon from '@mui/icons-material/Person';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
@@ -22,6 +23,7 @@ export default function AdminLogin() {
   const { snackbar, showSnackbar, closeSnackbar } = useSnackbar();
 
   const navigate = useNavigate();
+  const { loginAdmin } = useAuth();
 
   useEffect(() => {
     sessionStorage.setItem("login_username", username);
@@ -45,7 +47,7 @@ export default function AdminLogin() {
       const data = await response.json();
 
       if (response.ok) {
-      localStorage.setItem("admin_token", data.token); 
+      loginAdmin(data.token);
       showSnackbar({
         message: "login Berhasil!",
         anchorOrigin: { vertical: 'top', horizontal: 'center' },

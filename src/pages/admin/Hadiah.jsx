@@ -28,6 +28,7 @@ import { BACKEND_URL } from "../../config/socket";
 import useSnackbar from "../../hooks/useSnackbar";
 import useDialog from "../../hooks/useDialog";
 import useConfirmDialog from "../../hooks/useConfirmDialog";
+import { useAuth } from "../../context/AuthContext.jsx";
 
 // Reusable Components
 import AppSnackbar from "../../components/ui/AppSnackbar";
@@ -62,6 +63,7 @@ export default function HadiahPage() {
   const editDialog = useDialog();
   const viewDialog = useDialog();
   const { dialog: confirmDialog, openConfirm, closeConfirm, handleConfirm } = useConfirmDialog();
+  const { authHeaders: authHeader } = useAuth();
 
   // State Data & Pagination
   const [hadiah, setHadiah] = useState([]);
@@ -83,9 +85,6 @@ export default function HadiahPage() {
   const [editForm, setEditForm] = useState(null);
   const [viewData, setViewData] = useState(null);
 
-  const token = localStorage.getItem("admin_token");
-  const authHeader = { Authorization: `Bearer ${token}`, "Content-Type": "application/json" };
-
   // ================= FETCH DATA ================= //
   
   // Fetch Dropdown Kelompok
@@ -97,7 +96,7 @@ export default function HadiahPage() {
     } catch (err) {
       console.error("Gagal load kelompok:", err);
     }
-  }, [token]);
+  }, [authHeader]);
 
   // Fetch Tabel Hadiah
   const fetchHadiah = useCallback(async () => {
@@ -119,7 +118,7 @@ export default function HadiahPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, limit, activeSearch, selectedTipe, showSnackbar, token]);
+  }, [page, limit, activeSearch, selectedTipe, showSnackbar, authHeader]);
 
   useEffect(() => { 
     fetchKelompok();

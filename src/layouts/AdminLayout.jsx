@@ -3,6 +3,7 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import LogoPindad from "../assets/element/pindad.webp"; 
 import useConfirmDialog from "../hooks/useConfirmDialog";
 import ConfirmDialog from "../components/common/ConfirmDialog";
+import { useAuth } from "../context/AuthContext.jsx";
 
 // Icons
 import MenuIcon from '@mui/icons-material/Menu';
@@ -20,9 +21,10 @@ export default function AdminLayout() {
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { dialog, openConfirm, closeConfirm } = useConfirmDialog();
+  const { logoutAdmin } = useAuth();
 
   const handleLogout = () => {
-    localStorage.removeItem("admin_token");
+    logoutAdmin();
     navigate("/admin");
   };
 

@@ -17,11 +17,17 @@ function readJsonStorage(key, fallback = null) {
 export function AuthProvider({ children }) {
   const [adminToken, setAdminToken] = useState(() => localStorage.getItem("admin_token"));
   const [user, setUser] = useState(() => readJsonStorage("user"));
+  const [hasRegistered, setHasRegistered] = useState(
+    () => localStorage.getItem("hasRegistered") === "true",
+  );
+  const [userId, setUserId] = useState(() => localStorage.getItem("id_user"));
 
   useEffect(() => {
     const handleStorage = (event) => {
       if (event.key === "admin_token") setAdminToken(event.newValue);
       if (event.key === "user") setUser(parseJson(event.newValue));
+      if (event.key === "hasRegistered") setHasRegistered(event.newValue === "true");
+      if (event.key === "id_user") setUserId(event.newValue);
     };
 
     window.addEventListener("storage", handleStorage);
@@ -40,7 +46,17 @@ export function AuthProvider({ children }) {
 
   const setUserSession = useCallback((nextUser) => {
     localStorage.setItem("user", JSON.stringify(nextUser));
+    if (nextUser?.id_user != null) localStorage.setItem("id_user", nextUser.id_user);
     setUser(nextUser);
+  }, []);
+
+  const registerUser = useCallback((nextUser) => {
+    localStorage.setItem("user", JSON.stringify(nextUser));
+    localStorage.setItem("hasRegistered", "true");
+    if (nextUser?.id_user != null) localStorage.setItem("id_user", nextUser.id_user);
+    setUser(nextUser);
+    setHasRegistered(true);
+    setUserId(nextUser?.id_user != null ? String(nextUser.id_user) : null);
   }, []);
 
   const logoutUser = useCallback(() => {
@@ -48,6 +64,8 @@ export function AuthProvider({ children }) {
     localStorage.removeItem("hasRegistered");
     localStorage.removeItem("id_user");
     setUser(null);
+    setHasRegistered(false);
+    setUserId(null);
   }, []);
 
   const value = useMemo(() => ({
@@ -55,14 +73,27 @@ export function AuthProvider({ children }) {
     isAdminAuthenticated: Boolean(adminToken),
     user,
     isUserAuthenticated: Boolean(user),
+    hasRegistered,
+    userId,
     authHeaders: adminToken
       ? { Authorization: `Bearer ${adminToken}`, "Content-Type": "application/json" }
       : { "Content-Type": "application/json" },
     loginAdmin,
     logoutAdmin,
     setUserSession,
+    registerUser,
     logoutUser,
-  }), [adminToken, user, loginAdmin, logoutAdmin, setUserSession, logoutUser]);
+  }), [
+    adminToken,
+    user,
+    hasRegistered,
+    userId,
+    loginAdmin,
+    logoutAdmin,
+    setUserSession,
+    registerUser,
+    logoutUser,
+  ]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

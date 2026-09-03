@@ -25,6 +25,7 @@ import { BACKEND_URL } from "../../config/socket";
 import useSnackbar from "../../hooks/useSnackbar";
 import useDialog from "../../hooks/useDialog";
 import useConfirmDialog from "../../hooks/useConfirmDialog";
+import { useAuth } from "../../context/AuthContext.jsx";
 
 // Reusable Components
 import AppSnackbar from "../../components/ui/AppSnackbar";
@@ -48,6 +49,7 @@ export default function PemenangPage() {
     const { snackbar, showSnackbar, closeSnackbar } = useSnackbar();
     const viewDialog = useDialog();
     const { dialog: confirmDialog, openConfirm, closeConfirm, handleConfirm } = useConfirmDialog();
+    const { authHeaders: authHeader } = useAuth();
 
     // State Data & Pagination
     const [pemenang, setPemenang] = useState([]);
@@ -66,9 +68,6 @@ export default function PemenangPage() {
     // State View Detail
     const [viewData, setViewData] = useState(null);
 
-    const token = localStorage.getItem("admin_token");
-    const authHeader = { Authorization: `Bearer ${token}`, "Content-Type": "application/json" };
-
 // ================= FETCH DATA ================= //
 
   // Ambil data Hadiah untuk Dropdown Filter
@@ -80,7 +79,7 @@ export default function PemenangPage() {
         } catch (err) {
         console.error("Gagal load hadiah:", err);
         }
-    }, [token]);
+    }, [authHeader]);
 
     // Ambil data Pemenang berdasar page, limit, dan filter
     const fetchPemenang = useCallback(async () => {
@@ -108,7 +107,7 @@ export default function PemenangPage() {
         } finally {
         setLoading(false);
         }
-    }, [page, limit, activeSearch, selectedHadiah, showSnackbar, token]);
+    }, [page, limit, activeSearch, selectedHadiah, showSnackbar, authHeader]);
 
     useEffect(() => { fetchHadiah(); }, [fetchHadiah]);
     useEffect(() => { fetchPemenang(); }, [fetchPemenang]);

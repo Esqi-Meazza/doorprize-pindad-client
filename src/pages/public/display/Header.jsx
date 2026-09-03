@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import {useNavigate} from 'react-router-dom';
 import { BACKEND_URL } from '../../../config/socket';
 
@@ -8,6 +8,7 @@ import AppDialog from '../../../components/ui/AppDialog';
 import ConfirmDialog from '../../../components/common/ConfirmDialog';
 import useConfirmDialog from '../../../hooks/useConfirmDialog';
 import useDialog from '../../../hooks/useDialog';
+import { useAuth } from '../../../context/AuthContext.jsx';
 
 import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -17,21 +18,12 @@ import pindad from "../../../assets/element/pindad.webp";
 export default function DoorprizeHeader() {
   const { open: isQrOpen, openDialog: openQrDialog, closeDialog: closeQrDialog } = useDialog(false);
   const { dialog, openConfirm, closeConfirm } = useConfirmDialog();
-  const [userName, setUserName] = useState("User");
+  const { user, hasRegistered, logoutUser } = useAuth();
   const { snackbar, showSnackbar, closeSnackbar } = useSnackbar();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
-    if (user?.nama_lengkap) {
-      setUserName(user.nama_lengkap);
-    }
-  }, []);
-
   const handleLogout = async () => {
     try {
-      const user = JSON.parse(localStorage.getItem("user"));
-
       if (!user?.id_user) {
         throw new Error("ID user tidak ditemukan");
       }
@@ -50,9 +42,8 @@ export default function DoorprizeHeader() {
 
       if (!response.ok) {
         throw new Error(resData.error || "Logout gagal");
-      } localStorage.removeItem("user");
-        localStorage.removeItem("hasRegistered");
-        localStorage.removeItem("id_user");
+      }
+      logoutUser();
 
       closeConfirm();
 
@@ -86,11 +77,10 @@ export default function DoorprizeHeader() {
   };
 
   useEffect(() => {
-    const hasRegistered = localStorage.getItem("hasRegistered");
     if (!hasRegistered) {
       navigate("/");
     }
-  }, [navigate]); 
+  }, [hasRegistered, navigate]);
 
   return (
     <header className="h-tgh flex items-center justify-between px-4 md:px-10">
@@ -109,7 +99,7 @@ export default function DoorprizeHeader() {
       </div>
       
       <div className="flex flex-1 justify-center">
-        <h1 className="uppercase text-olive tracking-wide font-black text-2.5 md:text-3 lg:text-2xl">halooo {userName}!</h1>
+        <h1 className="uppercase text-olive tracking-wide font-black text-2.5 md:text-3 lg:text-2xl">halooo {user?.nama_lengkap || "User"}!</h1>
       </div>
 
       <div className="flex flex-1 items-center justify-end">

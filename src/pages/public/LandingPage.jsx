@@ -6,6 +6,7 @@ import useSnackbar from "../../hooks/useSnackbar.js";
 import AppInput from "../../components/ui/AppInput.jsx";
 import AppDatePicker from "../../components/ui/AppDatePicker.jsx";
 import LoadingSpinner from "../../components/ui/LoadingSpinner.jsx";
+import { useAuth } from "../../context/AuthContext.jsx";
 
 import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
@@ -16,6 +17,7 @@ import orang from "../../assets/element/orang.webp";
 import "../../SlidingAnimation.css"; 
 
 export default function LandingPage() {
+  const { hasRegistered, registerUser } = useAuth();
 
   const [isActive, setIsActive] = useState(() => {
     const savedState = sessionStorage.getItem("page_is_active");
@@ -49,9 +51,8 @@ export default function LandingPage() {
   }, [isActive]);
 
   useEffect(() => {
-    const hasRegistered = localStorage.getItem('hasRegistered');
-    if (hasRegistered === 'true') navigate("/doorprize"); 
-  }, [navigate]);
+    if (hasRegistered) navigate("/doorprize");
+  }, [hasRegistered, navigate]);
 
   useEffect(() => {
     sessionStorage.setItem("login_nip", nip);
@@ -154,9 +155,7 @@ export default function LandingPage() {
         nama_lengkap: nama,
       };
 
-      localStorage.setItem('user', JSON.stringify(userData));
-      localStorage.setItem('hasRegistered', 'true');
-      localStorage.setItem('id_user', resData.data.id_user);
+      registerUser(userData);
       sessionStorage.removeItem("page_is_active");
       sessionStorage.removeItem("login_nip");
       sessionStorage.removeItem("login_tgl_lahir");

@@ -29,6 +29,7 @@ import { BACKEND_URL } from "../../config/socket";
 import useSnackbar from "../../hooks/useSnackbar";
 import useDialog from "../../hooks/useDialog";
 import useConfirmDialog from "../../hooks/useConfirmDialog";
+import { useAuth } from "../../context/AuthContext.jsx";
 
 // Reusable Components
 import AppSnackbar from "../../components/ui/AppSnackbar";
@@ -76,6 +77,7 @@ export default function PesertaPage() {
   const viewDialog = useDialog();
   const editDialog = useDialog();
   const { dialog: confirmDialog, openConfirm, closeConfirm, handleConfirm } = useConfirmDialog();
+  const { authHeaders } = useAuth();
 
   // State Data & Pagination
   const [peserta, setPeserta] = useState([]);
@@ -98,27 +100,25 @@ export default function PesertaPage() {
   const [viewData, setViewData] = useState(null);
   const [confirmKeyword, setConfirmKeyword] = useState("");
 
-  const token = localStorage.getItem("admin_token");
-
   // ================= FETCH DATA ================= //
   const fetchDivisi = useCallback(async () => {
     try {
       const res = await fetch(`${BACKEND_URL}/api/admin/divisi`, { 
-        headers: { Authorization: `Bearer ${token}` } 
+        headers: authHeaders 
       });
       const json = await res.json();
       if (json.success) setDivisiList(json.data);
     } catch (err) {
       console.error("Gagal load divisi:", err);
     }
-  }, [token]);
+  }, [authHeaders]);
 
   const fetchPeserta = useCallback(async () => {
     setLoading(true);
     try {
       const query = new URLSearchParams({ page, limit, search: activeSearch, divisi: selectedDivisi }).toString();
       const res = await fetch(`${BACKEND_URL}/api/admin/peserta-paged?${query}`, { 
-        headers: { Authorization: `Bearer ${token}` } 
+        headers: authHeaders 
       });
       const json = await res.json();
 
@@ -134,7 +134,7 @@ export default function PesertaPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, limit, activeSearch, selectedDivisi, showSnackbar, token]);
+  }, [page, limit, activeSearch, selectedDivisi, showSnackbar, authHeaders]);
 
   useEffect(() => { fetchDivisi(); }, [fetchDivisi]);
   useEffect(() => { fetchPeserta(); }, [fetchPeserta]);
@@ -165,7 +165,7 @@ export default function PesertaPage() {
       const payload = { ...addForm, tgl_lahir: addForm.tgl_lahir?.date || null };
       const res = await fetch(`${BACKEND_URL}/api/admin/peserta`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        headers: authHeaders,
         body: JSON.stringify(payload),
       });
       const json = await res.json();
@@ -209,7 +209,7 @@ export default function PesertaPage() {
 
       const res = await fetch(`${BACKEND_URL}/api/admin/peserta/${editForm.id_user}`, {
         method: "PUT",
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        headers: authHeaders,
         body: JSON.stringify(payload),
       });
       const json = await res.json();
@@ -236,7 +236,7 @@ export default function PesertaPage() {
         try {
           const res = await fetch(`${BACKEND_URL}/api/admin/peserta/${row.id_user}`, {
             method: "DELETE",
-            headers: { Authorization: `Bearer ${token}` },
+            headers: authHeaders,
           });
           const json = await res.json();
           if (json.success) {
@@ -258,7 +258,7 @@ export default function PesertaPage() {
     try {
       const res = await fetch(`${BACKEND_URL}/api/admin/peserta/reset-all`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        headers: authHeaders,
         body: JSON.stringify({ confirm_keyword: confirmKeyword }),
       });
       const json = await res.json();

@@ -18,6 +18,7 @@ import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import { BACKEND_URL } from "../../config/socket";
 import useSnackbar from "../../hooks/useSnackbar";
 import useDialog from "../../hooks/useDialog";
+import { useAuth } from "../../context/AuthContext.jsx";
 
 // Components
 import AppSnackbar from "../../components/ui/AppSnackbar";
@@ -41,13 +42,8 @@ export default function SettingPage() {
   
   const { snackbar, showSnackbar, closeSnackbar } = useSnackbar();
   const resetDialog = useDialog();
+  const { authHeaders } = useAuth();
   
-  const token = localStorage.getItem("admin_token");
-  const authHeader = {
-    Authorization: `Bearer ${token}`,
-    "Content-Type": "application/json",
-  };
-
   const handleOpenModal = () => {
     setConfirmKeyword("");
     resetDialog.openDialog();
@@ -58,7 +54,7 @@ export default function SettingPage() {
     try {
       const response = await fetch(`${BACKEND_URL}/api/admin/resetevent`, {
         method: "POST",
-        headers: authHeader,
+        headers: authHeaders,
       });
 
       const data = await response.json();

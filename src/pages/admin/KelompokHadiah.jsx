@@ -28,6 +28,7 @@ import { BACKEND_URL } from "../../config/socket";
 import useSnackbar from "../../hooks/useSnackbar";
 import useDialog from "../../hooks/useDialog";
 import useConfirmDialog from "../../hooks/useConfirmDialog";
+import { useAuth } from "../../context/AuthContext.jsx";
 
 // Reusable Components
 import AppSnackbar from "../../components/ui/AppSnackbar";
@@ -63,6 +64,7 @@ export default function KelompokHadiahPage() {
     const editDialog = useDialog();
     const viewDialog = useDialog();
     const { dialog: confirmDialog, openConfirm, closeConfirm, handleConfirm } = useConfirmDialog();
+    const { authHeaders: authHeader } = useAuth();
 
     // State Data & Pagination
     const [kelompok, setKelompok] = useState([]);
@@ -83,9 +85,6 @@ export default function KelompokHadiahPage() {
     const [addForm, setAddForm] = useState(DEFAULT_ADD_FORM);
     const [editForm, setEditForm] = useState(null);
     const [viewData, setViewData] = useState(null);
-
-    const token = localStorage.getItem("admin_token");
-    const authHeader = { Authorization: `Bearer ${token}`, "Content-Type": "application/json" };
 
   // ================= FETCH DATA ================= //
     const fetchKelompok = useCallback(async () => {
@@ -110,7 +109,7 @@ export default function KelompokHadiahPage() {
         } finally {
         setLoading(false);
         }
-    }, [page, limit, activeSearch, selectedTipe, selectedStatus, showSnackbar, token]);
+    }, [page, limit, activeSearch, selectedTipe, selectedStatus, showSnackbar, authHeader]);
 
     useEffect(() => { fetchKelompok(); }, [fetchKelompok]);
 

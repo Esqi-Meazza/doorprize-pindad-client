@@ -1,8 +1,9 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import { useAuth } from "../context/AuthContext.jsx";
 
 export default function ProtectedRoute() {
-  const token = localStorage.getItem("admin_token");
+  const { adminToken: token, logoutAdmin } = useAuth();
 
   if (!token) {
     return <Navigate to="/admin" replace />;
@@ -13,13 +14,13 @@ export default function ProtectedRoute() {
     const currentTime = Date.now() / 1000;
 
     if (decoded.exp < currentTime) {
-      localStorage.removeItem("admin_token");
+      logoutAdmin();
       return <Navigate to="/admin" replace />;
     }
 
     return <Outlet />;
   } catch {
-    localStorage.removeItem("admin_token");
+    logoutAdmin();
     return <Navigate to="/admin" replace />;
   }
 }
