@@ -34,6 +34,7 @@ client/
 │   │       ├── AppDialog.jsx
 │   │       ├── AppInput.jsx
 │   │       ├── AppSnackbar.jsx
+│   │       ├── button.jsx
 │   │       ├── LoadingSkeleton.jsx
 │   │       └── LoadingSpinner.jsx
 │   ├── config/
@@ -47,6 +48,8 @@ client/
 │   │   └── useSnackbar.js
 │   ├── layouts/
 │   │   └── AdminLayout.jsx
+│   ├── lib/
+│   │   └── utils.js
 │   ├── pages/
 │   │   ├── admin/
 │   │   │   ├── Dashboard.jsx
@@ -103,7 +106,8 @@ client/
 
 ### Layer components reusable
 - `src/components/common/` — komponen umum lintas halaman seperti filter bar, pagination, grid kartu undian, dan dialog konfirmasi.
-- `src/components/ui/` — komponen UI dasar seperti input, date picker, dialog, snackbar, skeleton loading, dan spinner.
+- `src/components/ui/` — komponen UI dasar seperti input, date picker, dialog, snackbar, tombol, skeleton loading, dan spinner.
+- `src/components/ui/button.jsx` — komponen tombol reusable berbasis Base UI dengan variasi tampilan dan ukuran.
 
 ### Layer state dan komunikasi
 - `src/context/AuthContext.jsx` — state autentikasi admin/peserta dan penyimpanan sesi pada `localStorage`.
@@ -112,6 +116,7 @@ client/
 - `src/hooks/useDialog.js` — state buka/tutup dialog sederhana.
 - `src/hooks/useLoading.js` — state loading dan wrapper untuk fungsi asynchronous.
 - `src/hooks/useSnackbar.js` — state serta helper notifikasi snackbar.
+- `src/lib/utils.js` — utilitas class name `cn` untuk menggabungkan class CSS.
 
 ### Layer asset dan styling
 - `src/assets/element/` — logo, gambar background login, dan gambar ilustrasi.
