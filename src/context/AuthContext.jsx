@@ -15,7 +15,7 @@ function readJsonStorage(key, fallback = null) {
 }
 
 export function AuthProvider({ children }) {
-  const [adminToken, setAdminToken] = useState(() => localStorage.getItem("admin_token"));
+  const [adminToken, setAdminToken] = useState(() => sessionStorage.getItem("admin_token"));
   const [user, setUser] = useState(() => readJsonStorage("user"));
   const [hasRegistered, setHasRegistered] = useState(
     () => localStorage.getItem("hasRegistered") === "true",
@@ -24,7 +24,7 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const handleStorage = (event) => {
-      if (event.key === "admin_token") setAdminToken(event.newValue);
+      if (event.key === "admin_token") setAdminToken(event.newValue || null);
       if (event.key === "user") setUser(parseJson(event.newValue));
       if (event.key === "hasRegistered") setHasRegistered(event.newValue === "true");
       if (event.key === "id_user") setUserId(event.newValue);
@@ -32,27 +32,32 @@ export function AuthProvider({ children }) {
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
   }, []);
+
   const loginAdmin = useCallback((token) => {
-    localStorage.setItem("admin_token", token);
+    sessionStorage.setItem("admin_token", token);
     setAdminToken(token);
   }, []);
+
   const logoutAdmin = useCallback(() => {
-    localStorage.removeItem("admin_token");
+    sessionStorage.removeItem("admin_token");
     setAdminToken(null);
   }, []);
+
   const setUserSession = useCallback((nextUser) => {
     localStorage.setItem("user", JSON.stringify(nextUser));
-    if (nextUser?.id_user != null) localStorage.setItem("id_user", nextUser.id_user);
+    if (nextUser?.id_user != null) localStorage.setItem("id_user", String(nextUser.id_user));
     setUser(nextUser);
   }, []);
+
   const registerUser = useCallback((nextUser) => {
     localStorage.setItem("user", JSON.stringify(nextUser));
     localStorage.setItem("hasRegistered", "true");
-    if (nextUser?.id_user != null) localStorage.setItem("id_user", nextUser.id_user);
+    if (nextUser?.id_user != null) localStorage.setItem("id_user", String(nextUser.id_user));
     setUser(nextUser);
     setHasRegistered(true);
     setUserId(nextUser?.id_user != null ? String(nextUser.id_user) : null);
   }, []);
+
   const logoutUser = useCallback(() => {
     localStorage.removeItem("user");
     localStorage.removeItem("hasRegistered");
@@ -61,6 +66,7 @@ export function AuthProvider({ children }) {
     setHasRegistered(false);
     setUserId(null);
   }, []);
+
   const value = useMemo(() => ({
     adminToken,
     isAdminAuthenticated: Boolean(adminToken),
