@@ -5,22 +5,17 @@ export default function Grid({
   isSpinning = false,
   winners = [],
   prizeName = "HADIAH",
-  isDesktop = true,       // Pastikan di parent diatur: window.innerWidth >= 1024 (Laptop ke atas)
+  isDesktop = true,
   countdown = 0,
   participantPool = [],
-  mode = "reguler"        // BARU: Menerima tipe event (super, grand, reguler)
+  mode = "reguler" 
 }) {
   const [displayNames, setDisplayNames] = useState([]);
-
-  // ==========================================
-  // LOGIKA UKURAN DINAMIS BERDASARKAN MODE
-  // ==========================================
   const getStyleByMode = () => {
     switch (mode) {
       case 'super':
         return {
           gap: "gap-6 sm:gap-8",
-          // Super: Ukuran sangat besar (Hanya 1 Pemenang)
           cardSize: "w-80 sm:w-[500px] h-60 sm:h-[320px]", 
           numSize: "text-2xl sm:text-4xl",
           prizeSize: "text-base sm:text-xl",
@@ -29,16 +24,14 @@ export default function Grid({
       case 'grand':
         return {
           gap: "gap-4 sm:gap-6",
-          // Grand: Ukuran medium (Untuk 2 - 4 Pemenang)
           cardSize: "w-64 sm:w-80 h-48 sm:h-56", 
           numSize: "text-xl sm:text-2xl",
           prizeSize: "text-sm sm:text-base",
           nameSize: "text-xl sm:text-3xl",
         };
       default:
-        // Reguler: Ukuran standar (Untuk batch banyak pemenang)
         return {
-          gap: "gap-3 sm:gap-4", // Gap diperkecil agar tidak terlalu jauh
+          gap: "gap-3 sm:gap-4", 
           cardSize: "w-48 sm:w-60 h-36 sm:h-44", 
           numSize: "text-base sm:text-lg",
           prizeSize: "text-xs sm:text-sm",
@@ -46,15 +39,9 @@ export default function Grid({
         };
     }
   };
-
   const style = getStyleByMode();
-
-  // ==========================================
-  // LOGIKA ANIMASI RNG
-  // ==========================================
   useEffect(() => {
     let intervalId;
-
     if (isSpinning && isDesktop) {
       const pool = participantPool.length > 0 
         ? participantPool 
@@ -74,7 +61,6 @@ export default function Grid({
       });
       setDisplayNames(currentDisplay);
     }
-
     return () => clearInterval(intervalId);
   }, [isSpinning, isDesktop, count, winners, participantPool]);
 

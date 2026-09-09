@@ -183,7 +183,6 @@ export default function ProjectorDisplay() {
         console.warn('Audio belum dapat diaktifkan:', error);
       }
     }
-
     await fetch(`${BACKEND_URL}/api/spin/start`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -195,34 +194,28 @@ export default function ProjectorDisplay() {
       })
     });
   };
-
   const handleStop = async () => {
     if (spinAudioRef.current) {
       spinAudioRef.current.pause();
       spinAudioRef.current.currentTime = 0;
     }
-
     if (winAudioRef.current) {
       winAudioRef.current.currentTime = 0;
       winAudioRef.current.play().catch(e => console.log('Audio pemenang gagal diputar:', e));
     }
-
     await fetch(`${BACKEND_URL}/api/spin/stop`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id_kelompok: sessionData.id_kelompok })
     });
   };
-
   const handleRespin = async () => {
     const isConfirm = window.confirm("Batal dan acak ulang sesi ini?");
     if (!isConfirm) return;
-
     if (spinAudioRef.current) {
       spinAudioRef.current.currentTime = 0;
       spinAudioRef.current.play().catch(e => console.log('Audio spin gagal diputar:', e));
     }
-
     await fetch(`${BACKEND_URL}/api/spin/respin`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -233,11 +226,8 @@ export default function ProjectorDisplay() {
       })
     });
   };
-
-  // EKSEKUSI API AUTO-NEXT KE SESI SELANJUTNYA
   const handleNext = async () => {
     if (!sessionData?.id_kelompok) return;
-
     try {
       const response = await fetch(`${BACKEND_URL}/api/spin/next`, {
         method: 'POST',
@@ -253,7 +243,6 @@ export default function ProjectorDisplay() {
       alert(`Gagal pindah sesi: ${error.message}`);
     }
   };
-
   if (!sessionData) return <div className="p-10 text-xl font-bold text-center mt-20 text-red-600">Sesi tidak valid. Silakan buka dari halaman Admin.</div>;
 
   return (

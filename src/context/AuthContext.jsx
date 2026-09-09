@@ -29,27 +29,22 @@ export function AuthProvider({ children }) {
       if (event.key === "hasRegistered") setHasRegistered(event.newValue === "true");
       if (event.key === "id_user") setUserId(event.newValue);
     };
-
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
   }, []);
-
   const loginAdmin = useCallback((token) => {
     localStorage.setItem("admin_token", token);
     setAdminToken(token);
   }, []);
-
   const logoutAdmin = useCallback(() => {
     localStorage.removeItem("admin_token");
     setAdminToken(null);
   }, []);
-
   const setUserSession = useCallback((nextUser) => {
     localStorage.setItem("user", JSON.stringify(nextUser));
     if (nextUser?.id_user != null) localStorage.setItem("id_user", nextUser.id_user);
     setUser(nextUser);
   }, []);
-
   const registerUser = useCallback((nextUser) => {
     localStorage.setItem("user", JSON.stringify(nextUser));
     localStorage.setItem("hasRegistered", "true");
@@ -58,7 +53,6 @@ export function AuthProvider({ children }) {
     setHasRegistered(true);
     setUserId(nextUser?.id_user != null ? String(nextUser.id_user) : null);
   }, []);
-
   const logoutUser = useCallback(() => {
     localStorage.removeItem("user");
     localStorage.removeItem("hasRegistered");
@@ -67,7 +61,6 @@ export function AuthProvider({ children }) {
     setHasRegistered(false);
     setUserId(null);
   }, []);
-
   const value = useMemo(() => ({
     adminToken,
     isAdminAuthenticated: Boolean(adminToken),

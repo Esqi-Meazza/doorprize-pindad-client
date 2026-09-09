@@ -88,13 +88,10 @@ export default function DoorprizePage() {
       setWinners([]);
       setAppState('SPINNING');
     });
-
     socket.on('SPIN_RESULT', (data) => {
       setWinners(data.winners);
       setAppState('RESULT');
     });
-
-    // SINKRONISASI SESI BARU
     socket.on('SESSION_CHANGED', (newSession) => {
       setSessionData({
         mode: newSession.mode,
@@ -104,18 +101,14 @@ export default function DoorprizePage() {
       setWinners([]);
       setAppState('STANDBY');
     });
-
-    // JIKA ADMIN MENEKAN "TUTUP PANGGUNG", RESET TAMPILAN HP KE DEFAULT
     socket.on('STAGE_CLEARED', () => {
       setSessionData({ mode: '', jumlah_slot: 0, title: 'DOORPRIZE' });
       setWinners([]);
       setAppState('STANDBY');
     });
-
     socket.on('ALL_COMPLETED', () => {
       setAppState('COMPLETED');
     });
-
     return () => {
       socket.off('SPIN_STARTED');
       socket.off('SPIN_RESULT');
@@ -124,12 +117,6 @@ export default function DoorprizePage() {
       socket.off('ALL_COMPLETED');
     };
   }, []);
-
-  // ==========================================
-  // RENDER BLOCKS
-  // ==========================================
-
-  // 1. Kondisi LOADING
   if (appState === 'LOADING') {
     return (
       <div className="fixed inset-0 flex flex-col items-center justify-center bg-white z-9999">
