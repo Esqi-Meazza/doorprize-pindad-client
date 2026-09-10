@@ -21,6 +21,7 @@ export function AuthProvider({ children }) {
     () => localStorage.getItem("hasRegistered") === "true",
   );
   const [userId, setUserId] = useState(() => localStorage.getItem("id_user"));
+  const [userToken, setUserToken] = useState(() => sessionStorage.getItem("user_token"));
 
   useEffect(() => {
     const handleStorage = (event) => {
@@ -28,6 +29,7 @@ export function AuthProvider({ children }) {
       if (event.key === "user") setUser(parseJson(event.newValue));
       if (event.key === "hasRegistered") setHasRegistered(event.newValue === "true");
       if (event.key === "id_user") setUserId(event.newValue);
+      if (event.key === "user_token") setUserToken(event.newValue || null);
     };
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
@@ -50,21 +52,26 @@ export function AuthProvider({ children }) {
   }, []);
 
   const registerUser = useCallback((nextUser) => {
-    localStorage.setItem("user", JSON.stringify(nextUser));
+    const { token, ...userData } = nextUser || {};
+    localStorage.setItem("user", JSON.stringify(userData));
     localStorage.setItem("hasRegistered", "true");
-    if (nextUser?.id_user != null) localStorage.setItem("id_user", String(nextUser.id_user));
-    setUser(nextUser);
+    sessionStorage.setItem("user_token", token || "");
+    if (userData?.id_user != null) localStorage.setItem("id_user", String(userData.id_user));
+    setUser(userData);
     setHasRegistered(true);
-    setUserId(nextUser?.id_user != null ? String(nextUser.id_user) : null);
+    setUserId(userData?.id_user != null ? String(userData.id_user) : null);
+    setUserToken(token || null);
   }, []);
 
   const logoutUser = useCallback(() => {
     localStorage.removeItem("user");
     localStorage.removeItem("hasRegistered");
     localStorage.removeItem("id_user");
+    sessionStorage.removeItem("user_token");
     setUser(null);
     setHasRegistered(false);
     setUserId(null);
+    setUserToken(null);
   }, []);
 
   const value = useMemo(() => ({
@@ -74,6 +81,9 @@ export function AuthProvider({ children }) {
     isUserAuthenticated: Boolean(user),
     hasRegistered,
     userId,
+    userAuthHeaders: userToken
+      ? { Authorization: `Bearer ${userToken}`, "Content-Type": "application/json" }
+      : { "Content-Type": "application/json" },
     authHeaders: adminToken
       ? { Authorization: `Bearer ${adminToken}`, "Content-Type": "application/json" }
       : { "Content-Type": "application/json" },
@@ -87,6 +97,7 @@ export function AuthProvider({ children }) {
     user,
     hasRegistered,
     userId,
+    userToken,
     loginAdmin,
     logoutAdmin,
     setUserSession,

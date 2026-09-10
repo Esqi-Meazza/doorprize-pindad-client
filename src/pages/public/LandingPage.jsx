@@ -153,6 +153,7 @@ export default function LandingPage() {
       const userData = {
         id_user: resData.data.id_user,
         nama_lengkap: nama,
+        token: resData.data.token,
       };
 
       registerUser(userData);

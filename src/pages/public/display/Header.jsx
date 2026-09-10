@@ -18,7 +18,7 @@ import pindad from "../../../assets/element/pindad.webp";
 export default function DoorprizeHeader() {
   const { open: isQrOpen, openDialog: openQrDialog, closeDialog: closeQrDialog } = useDialog(false);
   const { dialog, openConfirm, closeConfirm } = useConfirmDialog();
-  const { user, hasRegistered, logoutUser } = useAuth();
+  const { user, hasRegistered, logoutUser, userAuthHeaders } = useAuth();
   const { snackbar, showSnackbar, closeSnackbar } = useSnackbar();
   const navigate = useNavigate();
 
@@ -31,7 +31,7 @@ export default function DoorprizeHeader() {
       const response = await fetch(`${BACKEND_URL}/api/logout`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          ...userAuthHeaders,
         },
         body: JSON.stringify({
           id_user: user.id_user,
