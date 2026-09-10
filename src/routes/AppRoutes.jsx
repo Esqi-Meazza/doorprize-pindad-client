@@ -1,20 +1,21 @@
+import { lazy } from "react";
 import { Routes, Route } from "react-router-dom";
-// peserta
-import LandingPage from "../pages/public/LandingPage.jsx";
-import DoorprizePage from "../pages/public/display/index.jsx";
 // panitia
 import ProtectedRoute from "./ProtectedRoute.jsx";
 import AdminLayout from "../layouts/AdminLayout.jsx";
 
-import Login from "../pages/admin/Login.jsx";
-import DashboardPage from "../pages/admin/Dashboard.jsx";
-import MainEventPage from "../pages/admin/MainEvent.jsx";
-import ProjectorDisplay from "../pages/admin/ProjectorDisplay.jsx";
-import PesertaPage from "../pages/admin/Peserta.jsx";
-import PemenangPage from "../pages/admin/Pemenang.jsx";
-import HadiahPage from "../pages/admin/Hadiah.jsx";
-import KelompokHadiahPage from "../pages/admin/KelompokHadiah.jsx";
-import SettingPage from "../pages/admin/Setting.jsx";
+
+const LandingPage = lazy(() => import("../pages/public/LandingPage.jsx"));
+const DoorprizePage = lazy(() => import("../pages/public/display/index.jsx"));
+const Login = lazy(() => import("../pages/admin/Login.jsx"));
+const DashboardPage = lazy(() => import("../pages/admin/Dashboard.jsx"));
+const MainEventPage = lazy(() => import("../pages/admin/MainEvent.jsx"));
+const ProjectorDisplay = lazy(() => import("../pages/admin/ProjectorDisplay.jsx"));
+const PesertaPage = lazy(() => import("../pages/admin/Peserta.jsx"));
+const PemenangPage = lazy(() => import("../pages/admin/Pemenang.jsx"));
+const HadiahPage = lazy(() => import("../pages/admin/Hadiah.jsx"));
+const KelompokHadiahPage = lazy(() => import("../pages/admin/KelompokHadiah.jsx"));
+const SettingPage = lazy(() => import("../pages/admin/Setting.jsx"));
 
 function AppRoutes() {
 	return (
