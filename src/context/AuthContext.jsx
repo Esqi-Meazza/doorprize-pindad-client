@@ -74,36 +74,39 @@ export function AuthProvider({ children }) {
     setUserToken(null);
   }, []);
 
-  const value = useMemo(() => ({
-    adminToken,
-    isAdminAuthenticated: Boolean(adminToken),
-    user,
-    isUserAuthenticated: Boolean(user),
-    hasRegistered,
-    userId,
-    userAuthHeaders: userToken
-      ? { Authorization: `Bearer ${userToken}`, "Content-Type": "application/json" }
-      : { "Content-Type": "application/json" },
-    authHeaders: adminToken
-      ? { Authorization: `Bearer ${adminToken}`, "Content-Type": "application/json" }
-      : { "Content-Type": "application/json" },
-    loginAdmin,
-    logoutAdmin,
-    setUserSession,
-    registerUser,
-    logoutUser,
-  }), [
-    adminToken,
-    user,
-    hasRegistered,
-    userId,
-    userToken,
-    loginAdmin,
-    logoutAdmin,
-    setUserSession,
-    registerUser,
-    logoutUser,
-  ]);
+  const value = useMemo(
+    () => ({
+      adminToken,
+      isAdminAuthenticated: Boolean(adminToken),
+      user,
+      isUserAuthenticated: Boolean(user),
+      hasRegistered,
+      userId,
+      userAuthHeaders: userToken
+        ? { Authorization: `Bearer ${userToken}`, "Content-Type": "application/json" }
+        : { "Content-Type": "application/json" },
+      authHeaders: adminToken
+        ? { Authorization: `Bearer ${adminToken}`, "Content-Type": "application/json" }
+        : { "Content-Type": "application/json" },
+      loginAdmin,
+      logoutAdmin,
+      setUserSession,
+      registerUser,
+      logoutUser,
+    }),
+    [
+      adminToken,
+      user,
+      hasRegistered,
+      userId,
+      userToken,
+      loginAdmin,
+      logoutAdmin,
+      setUserSession,
+      registerUser,
+      logoutUser,
+    ],
+  );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

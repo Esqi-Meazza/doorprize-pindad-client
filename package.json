@@ -8,6 +8,9 @@
     "dev:r": "node scripts/dev-reset.mjs",
     "build": "vite build",
     "lint": "oxlint",
+    "format": "prettier --write src/App.jsx src/routes/AppRoutes.jsx src/context/AuthContext.jsx src/pages/public/LandingPage.jsx src/pages/public/display/Header.jsx README.md vite.config.js .env.example",
+    "format:check": "prettier --check src/App.jsx src/routes/AppRoutes.jsx src/context/AuthContext.jsx src/pages/public/LandingPage.jsx src/pages/public/display/Header.jsx README.md vite.config.js .env.example",
+    "audit": "npm audit --audit-level=high",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -38,6 +41,7 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.2",
     "oxlint": "^1.69.0",
+    "prettier": "^3.9.6",
     "vite": "^8.1.0"
   }
 }

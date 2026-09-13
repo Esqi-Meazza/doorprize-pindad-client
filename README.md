@@ -1,16 +1,40 @@
-# React + Vite
+# Doorprize Client
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+React 19 + Vite frontend for the participant display, admin dashboard, and projector view.
 
-Currently, two official plugins are available:
+## Setup
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```powershell
+Copy-Item .env.example .env
+npm ci
+npm run dev
+```
 
-## React Compiler
+The default dev server runs at `http://localhost:5173` and proxies `/api` to the backend at `http://localhost:3001`. Set `VITE_BACKEND_URL` when the backend is hosted elsewhere.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Commands
 
-## Expanding the Oxlint configuration
+```powershell
+npm run dev
+npm run build
+npm run lint
+npm run format:check
+npm audit --audit-level=high --registry=https://registry.npmjs.org
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+## Application areas
+
+- Public landing page: participant check-in and session entry.
+- Doorprize display: realtime participant and winner display through Socket.IO.
+- Admin panel: protected event, participant, prize, group, winner, and setting management.
+- Projector display: dedicated realtime stage view for the event operator.
+
+Routes are lazy-loaded to keep the initial bundle small. Admin and participant tokens are stored in `sessionStorage`.
+
+## Project structure
+
+- `src/pages/` contains public and admin screens.
+- `src/components/` contains reusable UI and common controls.
+- `src/context/` contains auth and session state.
+- `src/routes/` contains lazy route registration and auth guards.
+- `src/config/socket.js` contains Socket.IO client configuration.

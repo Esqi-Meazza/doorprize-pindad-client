@@ -1,18 +1,18 @@
-import { useEffect } from 'react';
-import {useNavigate} from 'react-router-dom';
-import { BACKEND_URL } from '../../../config/socket';
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { BACKEND_URL } from "../../../config/socket";
 
-import AppSnackbar from '../../../components/ui/AppSnackbar';
-import useSnackbar from '../../../hooks/useSnackbar';
-import AppDialog from '../../../components/ui/AppDialog';
-import ConfirmDialog from '../../../components/common/ConfirmDialog';
-import useConfirmDialog from '../../../hooks/useConfirmDialog';
-import useDialog from '../../../hooks/useDialog';
-import { useAuth } from '../../../context/AuthContext.jsx';
+import AppSnackbar from "../../../components/ui/AppSnackbar";
+import useSnackbar from "../../../hooks/useSnackbar";
+import AppDialog from "../../../components/ui/AppDialog";
+import ConfirmDialog from "../../../components/common/ConfirmDialog";
+import useConfirmDialog from "../../../hooks/useConfirmDialog";
+import useDialog from "../../../hooks/useDialog";
+import { useAuth } from "../../../context/AuthContext.jsx";
 
 import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
-import LogoutIcon from '@mui/icons-material/Logout';
-import Tooltip from '@mui/material/Tooltip';
+import LogoutIcon from "@mui/icons-material/Logout";
+import Tooltip from "@mui/material/Tooltip";
 import pindad from "../../../assets/element/pindad.webp";
 
 export default function DoorprizeHeader() {
@@ -55,7 +55,6 @@ export default function DoorprizeHeader() {
       setTimeout(() => {
         navigate("/");
       }, 1000);
-
     } catch (error) {
       console.error("Logout error:", error);
       closeConfirm();
@@ -84,7 +83,6 @@ export default function DoorprizeHeader() {
 
   return (
     <header className="h-tgh flex items-center justify-between px-4 md:px-10">
-
       <AppSnackbar
         open={snackbar.open}
         message={snackbar.message}
@@ -92,43 +90,49 @@ export default function DoorprizeHeader() {
         anchorOrigin={snackbar.anchorOrigin}
         duration={snackbar.duration}
         onClose={closeSnackbar}
-      />  
+      />
 
       <div className="flex flex-1 justify-start">
         <img src={pindad} alt="Logo Pindad" className="object-contain h-8 md:h-12 lg:h-16" />
       </div>
-      
+
       <div className="flex flex-1 justify-center">
-        <h1 className="uppercase text-olive tracking-wide font-black text-2.5 md:text-3 lg:text-2xl">halooo {user?.nama_lengkap || "User"}!</h1>
+        <h1 className="uppercase text-olive tracking-wide font-black text-2.5 md:text-3 lg:text-2xl">
+          halooo {user?.nama_lengkap || "User"}!
+        </h1>
       </div>
 
       <div className="flex flex-1 items-center justify-end">
         {/* Menggunakan murni MUI IconButton agar efek ripple dan padding bawaan MUI bekerja sempurna */}
         <Tooltip title="Tampilkan QR Code" placement="bottom">
-          <button 
+          <button
             onClick={openQrDialog}
             className="bg-white hover:bg-white-500 text-olive p-2 md:p2 mr-2 md:mr-5 smooth-transition w-5 md:w-12 lg:w-18 rounded-buled center-flex"
           >
-            <CardGiftcardIcon sx={{ 
-              fontSize: { 
-                xs: '1.3rem',  
-                sm: '2rem',    
-              } 
-            }}/>
+            <CardGiftcardIcon
+              sx={{
+                fontSize: {
+                  xs: "1.3rem",
+                  sm: "2rem",
+                },
+              }}
+            />
           </button>
         </Tooltip>
 
         <Tooltip title="Keluar / Logout" placement="bottom">
-          <button 
+          <button
             onClick={confirmLogout}
             className="bg-kuning hover:bg-kuning-500 text-olive p-2 md:p2 smooth-transition w-5 md:w-12 lg:w-18 rounded-buled center-flex"
           >
-            <LogoutIcon sx={{ 
-              fontSize: { 
-                xs: '1.3rem', 
-                sm: '2rem',    
-              } 
-            }} />
+            <LogoutIcon
+              sx={{
+                fontSize: {
+                  xs: "1.3rem",
+                  sm: "2rem",
+                },
+              }}
+            />
           </button>
         </Tooltip>
       </div>
@@ -140,9 +144,12 @@ export default function DoorprizeHeader() {
         maxWidth="sm"
         fullWidth
       >
-        <div className="min-h-87.5 flex items-center justify-center border-t-2 border-kuning" style={{ borderTopColor: '#f1c335' }}>
-          <div style={{ color: '#888', textAlign: 'center' }}>
-            <CardGiftcardIcon sx={{ fontSize: 100, color: '#ccc', mb: 2 }} />
+        <div
+          className="min-h-87.5 flex items-center justify-center border-t-2 border-kuning"
+          style={{ borderTopColor: "#f1c335" }}
+        >
+          <div style={{ color: "#888", textAlign: "center" }}>
+            <CardGiftcardIcon sx={{ fontSize: 100, color: "#ccc", mb: 2 }} />
             <p>[ Area Gambar QR Code Akan Tampil Di Sini ]</p>
           </div>
         </div>
