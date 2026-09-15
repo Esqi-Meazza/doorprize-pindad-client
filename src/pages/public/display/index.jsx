@@ -21,6 +21,7 @@ export default function DoorprizePage() {
   const [sessionData, setSessionData] = useState({ mode: '', jumlah_slot: 0, title: 'DOORPRIZE' });
   const [winners, setWinners] = useState([]);
   const [participantPool, setParticipantPool] = useState([]);
+  const [isSocketConnected, setIsSocketConnected] = useState(socket.connected);
 
   // 3. RESPONSIVE STATE
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
@@ -31,13 +32,15 @@ export default function DoorprizePage() {
     try {
       // Fetch pool peserta aktif
       const responsePool = await fetch(`${BACKEND_URL}/api/active`); 
+      if (!responsePool.ok) throw new Error(`Pool peserta gagal: HTTP ${responsePool.status}`);
       const resultPool = await responsePool.json();
-      setParticipantPool(resultPool.data);
+      setParticipantPool(Array.isArray(resultPool.data) ? resultPool.data : []);
       
       // Cek Status Panggung di Backend (Sync)
       const resState = await fetch(`${BACKEND_URL}/api/spin/current`);
+      if (!resState.ok) throw new Error(`Status panggung gagal: HTTP ${resState.status}`);
       const stateData = await resState.json();
-      const { appState: currentAppState, sessionData: currentSession, winners: currentWinners } = stateData.data;
+      const { appState: currentAppState, sessionData: currentSession, winners: currentWinners } = stateData.data || {};
 
       if (currentAppState !== 'STANDBY' && currentSession) {
         setSessionData({
@@ -79,6 +82,11 @@ export default function DoorprizePage() {
 
   // -- LISTENER SOCKET.IO --
   useEffect(() => {
+    const handleSocketConnect = () => setIsSocketConnected(true);
+    const handleSocketDisconnect = () => setIsSocketConnected(false);
+
+    socket.on('connect', handleSocketConnect);
+    socket.on('disconnect', handleSocketDisconnect);
     socket.on('SPIN_STARTED', (data) => {
       setSessionData({
         mode: data.mode,
@@ -110,6 +118,8 @@ export default function DoorprizePage() {
       setAppState('COMPLETED');
     });
     return () => {
+      socket.off('connect', handleSocketConnect);
+      socket.off('disconnect', handleSocketDisconnect);
       socket.off('SPIN_STARTED');
       socket.off('SPIN_RESULT');
       socket.off('SESSION_CHANGED');
@@ -160,6 +170,11 @@ export default function DoorprizePage() {
   // 4. MAIN DISPLAY (Standby / Spinning / Result)
   return (
     <div className="fixed inset-0 w-screen h-screen bg-white overflow-hidden font-sans">
+      {!isSocketConnected && (
+        <div className="absolute left-1/2 top-3 z-50 -translate-x-1/2 rounded-full bg-red-600 px-4 py-2 text-sm font-bold text-white shadow-lg">
+          Koneksi realtime terputus. Menunggu koneksi kembali...
+        </div>
+      )}
       <DoorprizeBackground />
 
       {/* Layer UI Content */}
@@ -172,7 +187,19 @@ export default function DoorprizePage() {
           
           {appState === 'STANDBY' && <StandbyStage />}
           
-          {(appState === 'SPINNING' || appState === 'RESULT') && (
+          {(appState === 'SPINNING' || appState === 'RESULT') && participantPool.length === 0 && (
+            <div className="flex min-h-full items-center justify-center p-6 text-center">
+              <p className="text-xl font-bold text-biru">Belum ada peserta aktif.</p>
+            </div>
+          )}
+
+          {appState === 'RESULT' && winners.length === 0 && (
+            <div className="flex min-h-full items-center justify-center p-6 text-center">
+              <p className="text-xl font-bold text-biru">Hasil undian belum tersedia.</p>
+            </div>
+          )}
+
+          {(appState === 'SPINNING' || (appState === 'RESULT' && winners.length > 0)) && participantPool.length > 0 && (
             <div className="w-full min-h-full p-4 flex flex-col items-center justify-start relative">
               
               <Grid 

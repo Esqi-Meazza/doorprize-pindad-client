@@ -37,6 +37,10 @@ export default function Dashboard() {
         fetch(`${BACKEND_URL}/api/admin/winners/latest`, { headers: authHeaders }),
       ]);
 
+      if (!statsRes.ok || !winnersRes.ok) {
+        throw new Error(`Dashboard API failed: ${statsRes.status}/${winnersRes.status}`);
+      }
+
       const statsJson = await statsRes.json();
       const winnersJson = await winnersRes.json();
 
@@ -46,7 +50,7 @@ export default function Dashboard() {
     } catch (err) {
       console.error("Gagal load data dashboard:", err);
       showSnackbar({
-        message: "Gagal load data dashboard" || err,
+        message: err.message || "Gagal load data dashboard",
         severity: "error",
         duration: 4000
       })

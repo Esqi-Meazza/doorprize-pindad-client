@@ -65,6 +65,8 @@ export default function LandingPage() {
   }, [tgl_lahir]);
 
   useEffect(() => {
+    const controller = new AbortController();
+
     const fetchAutofill = async () => {
       if (nip.trim() !== "" && tgl_lahir.trim() !== "") {
         setNama("");
@@ -76,6 +78,7 @@ export default function LandingPage() {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ nip, tgl_lahir }),
+              signal: controller.signal,
             }),
             new Promise((resolve) => setTimeout(resolve, 1200)),
           ]);
@@ -119,7 +122,10 @@ export default function LandingPage() {
       fetchAutofill();
     }, 350);
 
-    return () => clearTimeout(delayDebounceFn);
+    return () => {
+      clearTimeout(delayDebounceFn);
+      controller.abort();
+    };
   }, [nip, tgl_lahir, showSnackbar]);
 
   // LOGIKA SUBMIT
