@@ -129,7 +129,7 @@ export default function PesertaPage() {
       } else {
         showSnackbar({ message: json.error, severity: "error" });
       }
-    } catch (err) {
+    } catch {
       showSnackbar({ message: "Gagal memuat data peserta", severity: "error" });
     } finally {
       setLoading(false);
@@ -220,7 +220,7 @@ export default function PesertaPage() {
       } else {
         showSnackbar({ message: json.error, severity: "error" });
       }
-    } catch (err) {
+    } catch {
       showSnackbar({ message: "Terjadi kesalahan server", severity: "error" });
     } finally { setIsSubmitting(false); }
   };
@@ -245,7 +245,7 @@ export default function PesertaPage() {
           } else {
             showSnackbar({ message: json.error, severity: "error" });
           }
-        } catch (err) {
+        } catch {
           showSnackbar({ message: "Terjadi kesalahan server", severity: "error" });
         }
       }
@@ -270,7 +270,7 @@ export default function PesertaPage() {
       } else {
         showSnackbar({ message: json.error, severity: "error" });
       }
-    } catch (err) {
+    } catch {
       showSnackbar({ message: "Terjadi kesalahan server", severity: "error" });
     } finally { setIsSubmitting(false); }
   };

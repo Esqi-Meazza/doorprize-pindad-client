@@ -5,6 +5,7 @@ import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 
 // Config & Hooks
 import { socket, BACKEND_URL } from '../../config/socket.js';
+import { useAuth } from '../../context/AuthContext.jsx';
 import useSnackbar from '../../hooks/useSnackbar.js';
 import useConfirmDialog from '../../hooks/useConfirmDialog.js';
 
@@ -15,6 +16,7 @@ import LoadingSkeleton from '../../components/ui/LoadingSkeleton.jsx';
 
 export default function MainEventPage() {
   const navigate = useNavigate();
+  const { authHeaders } = useAuth();
   
   // Hooks UI
   const { snackbar, showSnackbar, closeSnackbar } = useSnackbar();
@@ -31,10 +33,13 @@ export default function MainEventPage() {
   const fetchSessionsAndState = async () => {
     setLoading(true);
     try {
-      const resSessions = await fetch(`${BACKEND_URL}/api/spin/sessions`);
+      const resSessions = await fetch(`${BACKEND_URL}/api/spin/sessions`, { headers: authHeaders });
       const dataSessions = await resSessions.json();
+      if (!resSessions.ok) {
+        throw new Error(dataSessions.message || `HTTP ${resSessions.status}`);
+      }
       
-      let dbSessions = dataSessions.data.map((s) => ({
+      const dbSessions = (Array.isArray(dataSessions.data) ? dataSessions.data : []).map((s) => ({
         id_kelompok: s.id_kelompok,
         nama_kelompok: s.nama_kelompok,
         tipe_event: s.tipe_event,
@@ -43,9 +48,12 @@ export default function MainEventPage() {
       }));
       setSessions(dbSessions);
 
-      const resState = await fetch(`${BACKEND_URL}/api/spin/current`);
+      const resState = await fetch(`${BACKEND_URL}/api/spin/current`, { headers: authHeaders });
       const stateData = await resState.json();
-      const { sessionData } = stateData.data;
+      if (!resState.ok) {
+        throw new Error(stateData.message || `HTTP ${resState.status}`);
+      }
+      const { sessionData } = stateData.data || {};
 
       const activeDbSession = dbSessions.find(s => s.status_sesi === 'active');
 
@@ -72,7 +80,7 @@ export default function MainEventPage() {
     }
   };
 
-  useEffect(() => { fetchSessionsAndState(); }, []);
+  useEffect(() => { fetchSessionsAndState(); }, [authHeaders]);
 
   // 2. SOCKET LISTENER
   useEffect(() => {
@@ -119,7 +127,7 @@ export default function MainEventPage() {
     try {
       await fetch(`${BACKEND_URL}/api/spin/set-session`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders,
         body: JSON.stringify({
           id_kelompok: selectedSession.id_kelompok,
           nama_kelompok: selectedSession.nama_kelompok,
@@ -136,8 +144,7 @@ export default function MainEventPage() {
         window.open('/admin/projector', '_blank');
         setIsProjectorActive(true);
       }
-    } catch (err) {
-      console.error("Gagal mengaktifkan sesi ke panggung:", err);
+    } catch {
       showSnackbar({ message: "Gagal terhubung ke panggung", severity: "error" });
     }
   };
@@ -151,10 +158,14 @@ export default function MainEventPage() {
       cancelText: "Batal",
       onConfirm: async () => {
         try {
-          await fetch(`${BACKEND_URL}/api/spin/clear`, { method: 'POST' });
+              const response = await fetch(`${BACKEND_URL}/api/spin/clear`, {
+                method: 'POST',
+                headers: authHeaders,
+              });
+              if (!response.ok) throw new Error(`HTTP ${response.status}`);
           closeConfirm();
           showSnackbar({ message: "Panggung berhasil ditutup", severity: "success" });
-        } catch (err) {
+        } catch {
           showSnackbar({ message: "Gagal mematikan panggung", severity: "error" });
         }
       }

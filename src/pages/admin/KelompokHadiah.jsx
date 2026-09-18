@@ -104,7 +104,7 @@ export default function KelompokHadiahPage() {
         } else {
             showSnackbar({ message: json.error, severity: "error" });
         }
-        } catch (err) {
+        } catch {
         showSnackbar({ message: "Gagal memuat data kelompok hadiah", severity: "error" });
         } finally {
         setLoading(false);
@@ -155,7 +155,7 @@ export default function KelompokHadiahPage() {
         } else {
             showSnackbar({ message: json.error, severity: "error" });
         }
-        } catch (err) {
+        } catch {
         showSnackbar({ message: "Terjadi kesalahan server", severity: "error" });
         } finally { setIsSubmitting(false); }
     };
@@ -193,7 +193,7 @@ export default function KelompokHadiahPage() {
         } else {
             showSnackbar({ message: json.error, severity: "error" });
         }
-        } catch (err) {
+        } catch {
         showSnackbar({ message: "Terjadi kesalahan server", severity: "error" });
         } finally { setIsSubmitting(false); }
     };
@@ -219,7 +219,7 @@ export default function KelompokHadiahPage() {
             } else {
                 showSnackbar({ message: json.error, severity: "error" });
             }
-            } catch (err) {
+            } catch {
             showSnackbar({ message: "Terjadi kesalahan server", severity: "error" });
             }
         }

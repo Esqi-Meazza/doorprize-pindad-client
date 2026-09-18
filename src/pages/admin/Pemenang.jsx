@@ -102,7 +102,7 @@ export default function PemenangPage() {
         } else {
             showSnackbar({ message: json.error, severity: "error" });
         }
-        } catch (err) {
+        } catch {
         showSnackbar({ message: "Gagal memuat data pemenang", severity: "error" });
         } finally {
         setLoading(false);
@@ -155,7 +155,7 @@ export default function PemenangPage() {
             } else {
                 showSnackbar({ message: json.error, severity: "error" });
             }
-            } catch (err) {
+            } catch {
             showSnackbar({ message: "Terjadi kesalahan server", severity: "error" });
             }
         }
