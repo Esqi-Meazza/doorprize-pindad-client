@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@mui/material';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
@@ -30,7 +30,7 @@ export default function MainEventPage() {
   const [loading, setLoading] = useState(true);
 
   // 1. INIT DATA & SINKRONISASI BACKEND
-  const fetchSessionsAndState = async () => {
+  const fetchSessionsAndState = useCallback(async () => {
     setLoading(true);
     try {
       const resSessions = await fetch(`${BACKEND_URL}/api/spin/sessions`, { headers: authHeaders });
@@ -78,9 +78,9 @@ export default function MainEventPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [authHeaders, showSnackbar]);
 
-  useEffect(() => { fetchSessionsAndState(); }, [authHeaders]);
+  useEffect(() => { fetchSessionsAndState(); }, [fetchSessionsAndState]);
 
   // 2. SOCKET LISTENER
   useEffect(() => {

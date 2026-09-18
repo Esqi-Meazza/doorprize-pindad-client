@@ -176,7 +176,7 @@ export default function PesertaPage() {
       } else {
         showSnackbar({ message: json.error, severity: "error" });
       }
-    } catch (err) {
+    } catch {
       showSnackbar({ message: "Terjadi kesalahan server", severity: "error" });
     } finally { setIsSubmitting(false); }
   };

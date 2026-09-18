@@ -89,7 +89,7 @@ export default function ProjectorDisplay() {
       }
     };
     fetchInitialData();
-  }, [authHeaders]); 
+  }, [authHeaders, sessionData]); 
 
   // 2. SOCKET LISTENERS (Sinkronisasi Visual)
   useEffect(() => {
